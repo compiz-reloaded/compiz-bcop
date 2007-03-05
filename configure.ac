@@ -1,0 +1,29 @@
+AC_PREREQ(2.57)
+
+AC_INIT([bcop],esyscmd(. ./VERSION;echo -n $VERSION), [onestone@beryl-project.org])
+
+AC_DEFINE_UNQUOTED(VERSION,"$VERSION",[Version])
+
+#AC_CONFIG_AUX_DIR(config)
+
+AM_INIT_AUTOMAKE([1.9 dist-bzip2])
+AC_CONFIG_HEADER([config.h])
+AM_MAINTAINER_MODE
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_HEADER_STDC
+
+AC_C_BIGENDIAN
+
+PKG_CHECK_MODULES(LIBXML2, "libxml-2.0")
+AC_SUBST(LIBXML2_REQUIRES)
+
+PKG_CHECK_MODULES(X11, "x11")
+AC_SUBST(X11_REQUIRES)
+
+AC_OUTPUT([
+bcop.pc
+Makefile
+src/Makefile
+])

@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+exec=@exec_prefix@/bin/bcop
+
+Name: bcop
+Description: Beryl/Compiz options parser
+Version: @VERSION@
+Requires: libxml-2.0 x11
+
