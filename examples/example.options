@@ -66,7 +66,7 @@
 		<option name="myname" type="string">
 			<short>test string option name</short>
 			<long>test string option name long</long>
-			<hint>window</hint>
+			<hints>window</hints>
 			<default>My name</default>
 		</option>
 		<subgroup name="Last subgroup">
