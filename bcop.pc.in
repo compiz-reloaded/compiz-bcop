@@ -2,7 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
-exec=@exec_prefix@/bin/bcop
+bin=@exec_prefix@/bin/bcop
 
 Name: bcop
 Description: Beryl/Compiz options parser

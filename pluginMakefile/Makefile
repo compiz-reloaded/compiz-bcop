@@ -39,7 +39,7 @@ CC        = gcc
 LIBTOOL   = libtool
 INSTALL   = install
 
-BCOP       = `pkg-config --variable=exec bcop`
+BCOP       = `pkg-config --variable=bin bcop`
 
 CFLAGS  = -g -Wall `pkg-config --cflags $(PKG_DEP) $(TARGET) `
 LDFLAGS = `pkg-config --libs $(PKG_DEP) $(TARGET) `
