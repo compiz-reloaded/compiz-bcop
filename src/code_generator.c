@@ -843,8 +843,9 @@ void addOption(Option *o)
 	}
 
 	addString(outs,"\t\t\tif (%s->notify[%s])\n"
-				"\t\t\t\t(*%s->notify[%s])(o, %s);\n", (o->screen)?"os":"od",
-				o->temp,(o->screen)?"os":"od",o->temp,o->temp);
+				"\t\t\t\t(*%s->notify[%s])(%s, o, %s);\n", (o->screen)?"os":"od",
+				o->temp,(o->screen)?"os":"od",o->temp,
+				(o->screen)?"screen":"display",o->temp);
 
 	addString(outs,"\t\t\treturn TRUE;\n"
 				"\t\t}\n"
@@ -932,7 +933,7 @@ void addDisplayOptions()
 		addString(&hdefines,"} %sDisplayOptions;\n\n",data.fUName);
 
 		addString(&hdefines,"typedef void (*%sDisplayOptionChangeNotifyProc)"
-				"(CompOption *opt, %sDisplayOptions num);\n\n",
+				"(CompDisplay *display, CompOption *opt, %sDisplayOptions num);\n\n",
 				data.name,data.fUName);
 
 		addString(&displayStruct,"\tCompOption opt[%sDisplayOptionNum];\n",data.fUName);
@@ -1058,7 +1059,7 @@ void addScreenOptions()
 		addString(&hdefines,"} %sScreenOptions;\n\n",data.fUName);
 
 		addString(&hdefines,"typedef void (*%sScreenOptionChangeNotifyProc)"
-				"(CompOption *opt, %sScreenOptions num);\n\n",
+				"(CompScreen *screen, CompOption *opt, %sScreenOptions num);\n\n",
 				data.name,data.fUName);
 
 		addString(&screenStruct,"\tCompOption opt[%sScreenOptionNum];\n",data.fUName);
