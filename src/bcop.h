@@ -57,6 +57,7 @@ typedef enum {
 	OptionTypeSelection,
 	OptionTypeColor,
 	OptionTypeAction,
+	OptionTypeMatch,
 	OptionTypeError
 } OptionType;
 
@@ -123,6 +124,11 @@ typedef struct _StringOptionInfo
     char *def;
 } StringOptionInfo;
 
+typedef struct _MatchOptionInfo
+{
+    char *def;
+} MatchOptionInfo;
+
 typedef struct _StringListOptionInfo
 {
 	OptionValuesList* begin;
@@ -161,6 +167,7 @@ typedef union _OptionInfo
     BindingOptionInfo         asBind;
     StringListOptionInfo      asSList;
 	ColorOptionInfo           asColor;
+	StringOptionInfo          asMatch;
 } OptionInfo;
 
 struct _Option {

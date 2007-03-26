@@ -302,6 +302,20 @@ void addBoolOption(Option *o)
 	addGetFunction(o,"Bool","",".value.b","");
 }
 
+void addMatchOption(Option *o)
+{
+	StringElement *out = (o->screen)?&initScreenOpt:&initDisplayOpt;
+	char name[1024];
+
+	sprintf(name,"%s_%s",data.uName,o->uName);
+	addString(&defines,"#define %s_DEFAULT \"%s\"\n\n",name,o->data.asString.def);
+
+	addString(out,"\tmatchInit (&o->value.match);\n");
+    addString(out,"\tmatchAddFromString (&o->value.match, %s_DEFAULT);\n",name);
+
+	addGetFunction(o,"CompMatch *","",".value.match","&");
+}
+
 void addStringOption(Option *o)
 {
 	StringElement *out = (o->screen)?&initScreenOpt:&initDisplayOpt;
@@ -315,7 +329,6 @@ void addStringOption(Option *o)
 
 	addGetFunction(o,"char *","",".value.s","");
 }
-
 
 void addStringListOption(Option *o)
 {
@@ -837,6 +850,12 @@ void addOption(Option *o)
 				"\t\t{\n");
 			addString(out,"\to->type = CompOptionTypeAction;\n");
 			addActionOption(o);
+			break;
+		case OptionTypeMatch:
+			addString(outs,"\t\tif (compSetMatchOption (o, value))\n"
+				"\t\t{\n");
+			addString(out,"\to->type = CompOptionTypeMatch;\n");
+			addMatchOption(o);
 			break;
 		default:
 			break;

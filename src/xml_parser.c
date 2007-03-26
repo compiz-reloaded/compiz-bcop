@@ -84,6 +84,8 @@ static OptionType get_Option_type(xmlChar * type)
 		return OptionTypeColor;
 	if (!xmlStrcmp(type, (const xmlChar *) "action"))
 		return OptionTypeAction;
+	if (!xmlStrcmp(type, (const xmlChar *) "match"))
+		return OptionTypeMatch;
 	return OptionTypeError;
 }
 
@@ -161,6 +163,21 @@ parseStringOption(xmlDoc *doc, xmlNode *node, Option *set)
 		if (!xmlStrcmp(cur->name, (const xmlChar *) "default")) {
 			xmlChar *key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
 			set->data.asString.def = strdup((char *)key);
+			xmlFree(key);
+		}
+		cur = cur->next;
+	}
+}
+
+static void
+parseMatchOption(xmlDoc *doc, xmlNode *node, Option *set)
+{
+	xmlNode *cur = node;
+	while (cur != NULL)
+	{
+		if (!xmlStrcmp(cur->name, (const xmlChar *) "default")) {
+			xmlChar *key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+			set->data.asMatch.def = strdup((char *)key);
 			xmlFree(key);
 		}
 		cur = cur->next;
@@ -631,6 +648,9 @@ parseOption(xmlDoc *doc, ParserState* pState, xmlNode *node)
 			break;
 		case OptionTypeAction:
 			parseActionOption(doc, node->xmlChildrenNode, ns);
+			break;
+		case OptionTypeMatch:
+			parseMatchOption(doc, node->xmlChildrenNode, ns);
 			break;
 		default:
 			break;
