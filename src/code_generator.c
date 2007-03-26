@@ -314,6 +314,17 @@ void addMatchOption(Option *o)
     addString(out,"\tmatchAddFromString (&o->value.match, %s_DEFAULT);\n",name);
 
 	addGetFunction(o,"CompMatch *","",".value.match","&");
+
+	if (o->screen)
+	{
+		addString(&initScreen,"\tmatchUpdate (s->display, &os->opt[%s].value.match);\n",o->temp);
+		addString(&finiScreen,"\tmatchFini(&os->opt[%s].value.match);\n",o->temp);
+	}
+	else
+	{
+		addString(&initDisplay,"\tmatchUpdate (d, &od->opt[%s].value.match);\n",o->temp);
+		addString(&finiDisplay,"\tmatchFini(&od->opt[%s].value.match);\n",o->temp);
+	}
 }
 
 void addStringOption(Option *o)
