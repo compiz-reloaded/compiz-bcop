@@ -162,7 +162,7 @@ parseStringOption(xmlDoc *doc, xmlNode *node, Option *set)
 	{
 		if (!xmlStrcmp(cur->name, (const xmlChar *) "default")) {
 			xmlChar *key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-			set->data.asString.def = strdup((char *)key);
+			set->data.asString.def = strdup((key)?(char *)key:"");
 			xmlFree(key);
 		}
 		cur = cur->next;
@@ -177,7 +177,7 @@ parseMatchOption(xmlDoc *doc, xmlNode *node, Option *set)
 	{
 		if (!xmlStrcmp(cur->name, (const xmlChar *) "default")) {
 			xmlChar *key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-			set->data.asMatch.def = strdup((char *)key);
+			set->data.asMatch.def = strdup((key)?(char *)key:"");
 			xmlFree(key);
 		}
 		cur = cur->next;
