@@ -282,10 +282,11 @@ parseEnumOption(xmlDoc *doc, xmlNode *node, Option *set)
 				}
 				l = l->next;
 			}
-			if (key && strlen((char *)key) && name && strlen((char *)name))
+			if (name && strlen((char *)name))
 			{
 				OptionValuesList *lv = calloc(1,sizeof(OptionValuesList));
-				lv->value = strdup((char *)key);
+				lv->value = (key && strlen((char *)key)) ?
+							strdup((char *)key) : strdup((char *)name);
 				lv->name = strToLower((char *)name);
 				lv->uName = strToUpper((char *)name);
 				lv->fUName = strToFirstUp((char *)name);
@@ -349,7 +350,8 @@ parseSelectionOption(xmlDoc *doc, xmlNode *node, Option *set)
 			if (key && strlen((char *)key) && name && strlen((char *)name))
 			{
 				OptionValuesList *lv = calloc(1,sizeof(OptionValuesList));
-				lv->value = strdup((char *)key);
+				lv->value = (key && strlen((char *)key)) ?
+							strdup((char *)key) : strdup((char *)name);
 				lv->name = strToLower((char *)name);
 				lv->uName = strToUpper((char *)name);
 				lv->fUName = strToFirstUp((char *)name);
