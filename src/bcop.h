@@ -212,6 +212,7 @@ typedef struct _ParserState {
 char * strToLower(char *str);
 char * strToUpper(char *str);
 char * strToFirstUp(char *str);
+char * strToCamel(char *str);
 
 int genCode(char *src, char *hdr);
 

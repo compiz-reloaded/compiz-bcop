@@ -573,7 +573,7 @@ parseOption(xmlDoc *doc, ParserState* pState, xmlNode *node)
 	Option *ns = calloc(1, sizeof(Option));
 	ns->name = strToLower((char *)name);
 	ns->uName = strToUpper((char *)name);
-	ns->fUName = strToFirstUp((char *)name);
+	ns->fUName = strToCamel((char *)name);
 	ns->type = sType;
 	ns->group = (pState->group)?strdup(pState->group):NULL;
 	ns->subGroup = (pState->subGroup)?strdup(pState->subGroup):NULL;
@@ -831,6 +831,28 @@ char * strToFirstUp(char *str)
 	char *ret = strToLower(str);
 	ret[0] = toupper(ret[0]);
 	return ret;
+}
+
+char * strToCamel(char *str)
+{
+	char *lowString = strToLower(str);
+	char *token;
+	char *buffer;
+
+	buffer = malloc (sizeof(char) * (strlen(lowString) + 1));
+	strcpy (buffer, "");
+
+	token = strtok (lowString, "_");
+	while (token)
+	{
+		token[0] = toupper(token[0]);
+		strcat (buffer, token);
+		token = strtok (NULL, "_");
+	}
+
+	free (lowString);
+	
+	return buffer;
 }
 
 static void usage(void)
