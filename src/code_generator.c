@@ -686,7 +686,12 @@ void addActionOption(Option *o)
 					data.uName,o->uName);
 		}
 		else
-			addString(out,"\to->value.action.key.keysym = 0;\n");
+		{
+			if (data.mode == CodeBeryl)
+				addString(out,"\to->value.action.key.keysym = 0;\n");
+			else
+				addString(out,"\to->value.action.key.keycode = 0;\n");
+		}
 	}
 
 	if (o->data.asBind.smouse)
