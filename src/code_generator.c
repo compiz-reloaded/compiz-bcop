@@ -1104,13 +1104,13 @@ void addScreenOptions()
 				data.fUName,data.name,data.fUName,data.fUName,data.fUName,data.fUName);
 
 		addString(&hdefines,"CompOption * %sGetScreenOption(CompScreen *d,"
-				" %sScreenOptions num);\n\n",data.uName, data.fUName);
+				" %sScreenOptions num);\n\n",data.name, data.fUName);
 
 
 		addString(&functions,"CompOption * %sGetScreenOption(CompScreen *d,"
 				" %sScreenOptions num)\n{\n\t%s_OPTIONS_SCREEN(d);\n"
 				"\treturn &os->opt[num];\n}\n\n",
-				data.uName, data.fUName, data.uName);
+				data.name, data.fUName, data.uName);
 
 	}
 
