@@ -986,6 +986,15 @@ void addDisplayOptions()
 				data.name,data.name,data.name,data.name,data.fUName,data.uName,
 				data.fUName,data.fUName,data.fUName,data.fUName);
 
+		addString(&hdefines,"CompOption * %sGetDisplayOption(CompDisplay *d,"
+				" %sDisplayOptions num);\n\n",data.name, data.fUName);
+
+
+		addString(&functions,"CompOption * %sGetDisplayOption(CompDisplay *d,"
+				" %sDisplayOptions num)\n{\n\t%s_OPTIONS_DISPLAY(d);\n"
+				"\treturn &od->opt[num];\n}\n\n",
+				data.name, data.fUName, data.uName);
+
 	}
 
 	addString(&displayStruct,"} %sOptionsDisplay;\n\n",data.fUName);
@@ -1093,6 +1102,16 @@ void addScreenOptions()
 				"\treturn os->mOpt;\n}\n\n",
 				data.name,data.name,data.name,data.name,data.fUName,data.uName,data.uName,
 				data.fUName,data.name,data.fUName,data.fUName,data.fUName,data.fUName);
+
+		addString(&hdefines,"CompOption * %sGetScreenOption(CompScreen *d,"
+				" %sScreenOptions num);\n\n",data.uName, data.fUName);
+
+
+		addString(&functions,"CompOption * %sGetScreenOption(CompScreen *d,"
+				" %sScreenOptions num)\n{\n\t%s_OPTIONS_SCREEN(d);\n"
+				"\treturn &os->opt[num];\n}\n\n",
+				data.uName, data.fUName, data.uName);
+
 	}
 
 	addString(&screenStruct,"} %sOptionsScreen;\n\n",data.fUName);
