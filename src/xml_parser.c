@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  *
  */
- 
+
 #ifdef HAVE_CONFIG_H
 #  include "../config.h"
 #endif
@@ -853,7 +853,7 @@ char * strToCamel(char *str)
 	}
 
 	free (lowString);
-	
+
 	return buffer;
 }
 
@@ -863,7 +863,6 @@ static void usage(void)
 	printf("Options:\n");
 	printf("  -h, --help           display this help message\n");
 	printf("  -v, --version        print version information\n");
-	printf("  -b, --beryl          generate beryl compatible code (default)\n");
 	printf("  -c, --compiz         generate compiz compatible code\n");
 	printf("  -q, --quiet          don't print informational messages\n");
 	printf("      --source=<file>  source file name\n");
@@ -877,7 +876,7 @@ static void usage(void)
 #define OPT_QUIET 'q'
 #define OPT_SOURCE 1
 #define OPT_HEADER 2
-	
+
 int main(int argc, char **argv)
 {
 	xmlDoc *doc = NULL;
@@ -885,19 +884,18 @@ int main(int argc, char **argv)
 	programName = argv[0];
 	char *src = NULL;
 	char *hdr = NULL;
-	
+
 	char sopts[] = "hvbcq";
 	struct option lopts[] = {
 		{"help", 0, 0, OPT_HELP},
 		{"version", 0, 0, OPT_VERSION},
-		{"beryl", 0, 0, OPT_BERYL},
 		{"compiz", 0, 0, OPT_COMPIZ},
 		{"quiet", 0, &quiet, OPT_QUIET},
 		{"source", 1, 0, OPT_SOURCE},
 		{"header", 1, 0, OPT_HEADER},
 		{0, 0, 0, 0}
 	};
-	
+
 	if (argc < 2)
 	{
 		usage();
@@ -917,14 +915,6 @@ int main(int argc, char **argv)
 		case OPT_VERSION:
 			printf(PACKAGE_STRING "\n");
 			return 0;
-		case OPT_BERYL:
-			if (data.mode != CodeNone)
-			{
-				fprintf(stderr,"%s: can only generate output for one composite manager\n",programName);
-				return 1;
-			}
-			data.mode = CodeBeryl;
-			break;
 		case OPT_COMPIZ:
 			if (data.mode != CodeNone)
 			{
@@ -953,7 +943,7 @@ int main(int argc, char **argv)
 	}
 
 	if (data.mode == CodeNone)
-		data.mode = CodeBeryl;
+		data.mode = CodeCompiz;
 
 	fileName = argv[argc-1];
 
@@ -991,7 +981,7 @@ int main(int argc, char **argv)
 		sprintf(str,"%s_options.h",prefix);
 		hdr = strdup(str);
 	}
-	
+
 	int rv = error;
 	if (!error)
 		rv = genCode(src,hdr);

@@ -62,7 +62,6 @@ typedef enum {
 } OptionType;
 
 typedef enum {
-	CodeBeryl,
 	CodeCompiz,
 	CodeNone
 } CodeType;

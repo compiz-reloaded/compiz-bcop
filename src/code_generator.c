@@ -676,21 +676,14 @@ void addActionOption(Option *o)
 		{
 			addString(&defines,"#define %s_%s_KEY_DEFAULT \"%s\"\n",
 					data.uName,o->uName,key);
-			if (data.mode == CodeBeryl)
-				addString(out,"\to->value.action.key.keysym = XStringToKeysym("
-					"%s_%s_KEY_DEFAULT);\n",data.uName,o->uName);
-			else
-				addString(out,"\to->value.action.key.keycode = \n"
+			addString(out,"\to->value.action.key.keycode = \n"
 					"\t\tXKeysymToKeycode (display,\n"
 					"\n\nXStringToKeysym(%s_%s_KEY_DEFAULT));\n",
 					data.uName,o->uName);
 		}
 		else
 		{
-			if (data.mode == CodeBeryl)
-				addString(out,"\to->value.action.key.keysym = 0;\n");
-			else
-				addString(out,"\to->value.action.key.keycode = 0;\n");
+			addString(out,"\to->value.action.key.keycode = 0;\n");
 		}
 	}
 
@@ -791,24 +784,6 @@ void addOption(Option *o)
 			addString(out,"\to->longDesc = \"%s\";\n",o->name);
 	}
 
-	if (data.mode == CodeBeryl)
-	{
-		if (o->hints)
-			addString(out,"\to->displayHints = \"%s\";\n",o->hints);
-		else
-			addString(out,"\to->displayHints = \"\";\n");
-
-		if (o->group)
-			addString(out,"\to->group = N_(\"%s\");\n",o->group);
-		else
-			addString(out,"\to->group = \"\";\n");
-
-		if (o->subGroup)
-			addString(out,"\to->subGroup = N_(\"%s\");\n",o->subGroup);
-		else
-			addString(out,"\to->subGroup = \"\";\n");
-	}
-	
 	addString(outs,"\tcase %s:\n",o->temp);
 
 	switch (o->type)
@@ -926,27 +901,14 @@ void addDisplayOptions()
 			"\tCompOption *o;\n\tint index;\n\n"
 			"\t%s_OPTIONS_DISPLAY(display);\n\n",data.name,data.uName);
 
-		if (data.mode == CodeBeryl)
-		{
-			addString(&initDisplay,"\t%sOptionsDisplayInitOptions(od);\n\n",
-					   data.name);
+		addString(&initDisplay,"\t%sOptionsDisplayInitOptions"
+				"(od, d->display);\n\n", data.name);
 
-			addString(&initDisplayOpt,"static void %sOptionsDisplayInitOptions"
-					"(%sOptionsDisplay * od)\n{\n"
-					"\tCompOption *o;\n\tint i;\n\ti = 0;\n\n",
-					data.name,data.fUName);
-		}
-		else
-		{
-			addString(&initDisplay,"\t%sOptionsDisplayInitOptions"
-					 "(od, d->display);\n\n", data.name);
+		addString(&initDisplayOpt,"static void %sOptionsDisplayInitOptions"
+				"(%sOptionsDisplay * od, Display *display)\n{\n"
+				"\tCompOption *o;\n\tint i;\n\ti = 0;\n\n",
+				data.name,data.fUName);
 
-			addString(&initDisplayOpt,"static void %sOptionsDisplayInitOptions"
-					"(%sOptionsDisplay * od, Display *display)\n{\n"
-					"\tCompOption *o;\n\tint i;\n\ti = 0;\n\n",
-					data.name,data.fUName);
-		}
-		
 		addString(&hdefines,"typedef enum\n"
 					"{\n");
 
@@ -1003,30 +965,8 @@ void addDisplayOptions()
 
 		addString(&initDisplayOpt,"}\n\n");
 
-		if (data.mode == CodeBeryl)
-			addString(&setDisplayOpt,"static CompOption *%sOptionsGetDisplayOptions"
-				"(CompDisplay * d, int *count)\n{\n"
-				"\tCompOption *pOpt = NULL;\n\tint pOptNum = 0;\n"
-				"\tif (%sPluginVTable && %sPluginVTable->getDisplayOptions)\n"
-				"\t\tpOpt = %sPluginVTable->getDisplayOptions(d,&pOptNum);\n\n"
-				"\t%sOptionsDisplay *od;\n"
-				"\tif (d)\n\t\tod = GET_%s_OPTIONS_DISPLAY(d);\n"
-				"\telse\n\t{\n\t\tod = calloc(1,sizeof(%sOptionsDisplay));\n"
-				"\t\t%sOptionsDisplayInitOptions(od);\n\t}\n\n"
-				"\tif (!pOptNum)\n\t{\n\t\t*count = %sDisplayOptionNum;\n"
-				"\t\treturn od->opt;\n\t}\n\n"
-				"\tint sOptSize = sizeof(CompOption) * %sDisplayOptionNum;\n"
-				"\tint pOptSize = sizeof(CompOption) * pOptNum;\n\n"
-				"\tif (!od->mOpt)\n"
-				"\t\tod->mOpt = malloc(sOptSize + pOptSize);\n\n"
-				"\tmemcpy(od->mOpt,od->opt,sOptSize);\n"
-				"\tmemcpy(od->mOpt + %sDisplayOptionNum,pOpt,pOptSize);\n\n"
-				"\t*count = %sDisplayOptionNum + pOptNum;\n"
-				"\treturn od->mOpt;\n}\n\n",
-				data.name,data.name,data.name,data.name,data.fUName,data.uName,
-				data.fUName,data.name,data.fUName,data.fUName,data.fUName,data.fUName);
-		else
-			addString(&setDisplayOpt,"static CompOption *%sOptionsGetDisplayOptions"
+
+		addString(&setDisplayOpt,"static CompOption *%sOptionsGetDisplayOptions"
 				"(CompDisplay * d, int *count)\n{\n"
 				"\tCompOption *pOpt = NULL;\n\tint pOptNum = 0;\n"
 				"\tif (%sPluginVTable && %sPluginVTable->getDisplayOptions)\n"
@@ -1045,7 +985,7 @@ void addDisplayOptions()
 				"\treturn od->mOpt;\n}\n\n",
 				data.name,data.name,data.name,data.name,data.fUName,data.uName,
 				data.fUName,data.fUName,data.fUName,data.fUName);
-			
+
 	}
 
 	addString(&displayStruct,"} %sOptionsDisplay;\n\n",data.fUName);
@@ -1160,14 +1100,11 @@ void addScreenOptions()
 
 void finilizeCode()
 {
-	
+
 	addString(&file,"#include <stdio.h>\n#include <stdlib.h>\n"
 			"#include <string.h>\n\n");
 
-	if (data.mode == CodeBeryl)
-		addString(&file,"#include <beryl.h>\n\n");
-	else
-		addString(&file,"#include <compiz.h>\n\n");
+	addString(&file,"#include <compiz.h>\n\n");
 
 	addString(&file,"#define _%s_OPTIONS_INTERNAL\n"
 			"#include \"%s\"\n\n",
