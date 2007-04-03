@@ -896,8 +896,8 @@ void addDisplayOptions()
 	if (nDOptions)
 	{
 		addString(&setDisplayOpt,"static Bool\n"
-			"%sOptionsSetDisplayOption(CompDisplay * display, "
-			"char *name, CompOptionValue * value)\n{\n"
+			"%sOptionsSetDisplayOption(CompPlugin * plugin, "
+			"CompDisplay * display, char *name, CompOptionValue * value)\n{\n"
 			"\tCompOption *o;\n\tint index;\n\n"
 			"\t%s_OPTIONS_DISPLAY(display);\n\n",data.name,data.uName);
 
@@ -946,7 +946,7 @@ void addDisplayOptions()
 		addString(&setDisplayOpt,"\tif (!o)\n\t{\n"
 				"\t\tif (%sPluginVTable && %sPluginVTable->setDisplayOption)\n"
 				"\t\t\treturn (*%sPluginVTable->setDisplayOption)"
-				"(display, name, value);\n\t\treturn FALSE;\n\t}\n\n",
+				"(plugin, display, name, value);\n\t\treturn FALSE;\n\t}\n\n",
 			   data.name,data.name,data.name);
 
 		addString(&setDisplayOpt,"\tswitch (index)\n\t{\n");
@@ -967,10 +967,10 @@ void addDisplayOptions()
 
 
 		addString(&setDisplayOpt,"static CompOption *%sOptionsGetDisplayOptions"
-				"(CompDisplay * d, int *count)\n{\n"
+				"(CompPlugin *p, CompDisplay * d, int *count)\n{\n"
 				"\tCompOption *pOpt = NULL;\n\tint pOptNum = 0;\n"
 				"\tif (%sPluginVTable && %sPluginVTable->getDisplayOptions)\n"
-				"\t\tpOpt = %sPluginVTable->getDisplayOptions(d,&pOptNum);\n\n"
+				"\t\tpOpt = %sPluginVTable->getDisplayOptions(p,d,&pOptNum);\n\n"
 				"\t%sOptionsDisplay *od;\n"
 				"\tod = GET_%s_OPTIONS_DISPLAY(d);\n"
 				"\tif (!pOptNum)\n\t{\n\t\t*count = %sDisplayOptionNum;\n"
@@ -1010,8 +1010,8 @@ void addScreenOptions()
 	if (nSOptions)
 	{
 		addString(&setScreenOpt,"static Bool\n"
-			"%sOptionsSetScreenOption(CompScreen * screen, "
-			"char *name, CompOptionValue * value)\n{\n"
+			"%sOptionsSetScreenOption(CompPlugin * plugin, "
+			"CompScreen * screen, char *name, CompOptionValue * value)\n{\n"
 			"\tCompOption *o;\n\tint index;\n\n"
 			"\t%s_OPTIONS_SCREEN(screen);\n\n",data.name,data.uName);
 
@@ -1059,7 +1059,7 @@ void addScreenOptions()
 		addString(&setScreenOpt,"\tif (!o)\n\t{\n"
 				"\t\tif (%sPluginVTable && %sPluginVTable->setScreenOption)\n"
 				"\t\t\treturn (*%sPluginVTable->setScreenOption)"
-				"(screen, name, value);\n\t\treturn FALSE;\n\t}\n\n",
+				"(plugin, screen, name, value);\n\t\treturn FALSE;\n\t}\n\n",
 				data.name,data.name,data.name);
 
 		addString(&setScreenOpt,"\tswitch (index)\n\t{\n");
@@ -1081,10 +1081,10 @@ void addScreenOptions()
 		addString(&initScreenOpt,"}\n\n");
 
 		addString(&setScreenOpt,"static CompOption *%sOptionsGetScreenOptions"
-				"(CompScreen * s, int *count)\n{\n"
+				"(CompPlugin * p, CompScreen * s, int *count)\n{\n"
 				"\tCompOption *pOpt = NULL;\n\tint pOptNum = 0;\n"
 				"\tif (%sPluginVTable && %sPluginVTable->getScreenOptions)\n"
-				"\t\tpOpt = %sPluginVTable->getScreenOptions(s,&pOptNum);\n\n"
+				"\t\tpOpt = %sPluginVTable->getScreenOptions(p,s,&pOptNum);\n\n"
 				"\t%sOptionsScreen *os;\n"
 				"\tif (s)\n\t\tos = GET_%s_OPTIONS_SCREEN(s, "
 				"GET_%s_OPTIONS_DISPLAY(s->display));\n"
