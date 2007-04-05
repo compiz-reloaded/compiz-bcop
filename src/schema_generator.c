@@ -68,6 +68,40 @@ gconfPrintf (int level, char *format, ...)
 	fprintf(schemaFile,"\n");
 }
 
+void gconfEscapeXML(char * value)
+{
+	char srcBuffer[8192];
+	char destBuffer[8192];
+	char tempBuffer[8192];
+	char * indx;
+	strcpy(srcBuffer,value);
+	destBuffer[0]='\0';
+	for (indx=srcBuffer;*indx;indx++)
+	{
+		strcpy(tempBuffer,destBuffer);
+		char * rep=NULL;
+		switch(*indx)
+		{
+			case '&':
+				rep="&amp;";
+				break;
+			case '<':
+				rep="&lt;";
+				break;
+			case '>':
+				rep="&gt;";
+				break;
+			default:
+				break;
+		}
+		if (rep)
+			sprintf(destBuffer,"%s%s",tempBuffer,rep);
+		else
+			sprintf(destBuffer,"%s%c",tempBuffer,*indx);
+	}
+	strcpy(value,destBuffer);
+}
+
 void gconfWriteHeader()
 {
 	gconfPrintf(0,"<!-- schema file written by bcop -->");
@@ -334,11 +368,13 @@ void gconfDumpToSchema(Option * o, char * pathFmt, char * subkey,
 	gconfPrintf(3,"<applyto>%s</applyto>",path);
 	gconfPrintf(3,"<owner>compiz</owner>");
 	gconfPrintf(3,"<type>%s</type>",gconfTypeToString(o->type,actionPart));
-	if (o->type == OptionTypeStringList ||
-			(o->type == OptionTypeAction && actionPart==actionPartEdge))
+	if (!strcmp(gconfTypeToString(o->type,actionPart),"list"))
 		gconfPrintf(3,"<list_type>string</list_type>");
 	if (gconfGetDefaultValue(o,value,actionPart))
+	{
+		gconfEscapeXML(value);
 		gconfPrintf(3,"<default>%s</default>",value);
+	}
 	else
 		gconfPrintf(3,"<!-- type not implemented yet -->");
 	gconfPrintf(3,"<locale name=\"C\">");
