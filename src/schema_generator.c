@@ -426,6 +426,8 @@ void gconfWriteSchema(int is_general)
 int genSchema(char *sch)
 {
 	int rv=0;
+
+	printf("Creating \"%s\"...", sch);
 	schemaFile = fopen(sch,"w");
 	if (!schemaFile)
     {
@@ -442,5 +444,7 @@ int genSchema(char *sch)
 			rv=2; // unknown mode
 	}
 	fclose(schemaFile);
+
+	printf("done.\n");
 	return rv;
 }

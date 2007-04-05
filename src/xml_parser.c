@@ -941,14 +941,35 @@ int main(int argc, char **argv)
 		case OPT_SOURCE:
 			if (optarg)
 				src = optarg;
+
+			if (data.mode != GenNone)
+			{
+				fprintf(stderr,"%s: can only generate output for one code/schema target\n",programName);
+				return 1;
+			}
+			data.mode = CodeCompiz;
 			break;
 		case OPT_HEADER:
 			if (optarg)
 				hdr = optarg;
+
+			if (data.mode != GenNone)
+			{
+				fprintf(stderr,"%s: can only generate output for one code/schema target\n",programName);
+				return 1;
+			}
+			data.mode = CodeCompiz;
 			break;
 		case OPT_SCHEMA:
 			if (optarg)
 			    sch = optarg;
+
+			if (data.mode != GenNone)
+			{
+				fprintf(stderr,"%s: can only generate output for one code/schema target\n",programName);
+				return 1;
+			}
+			data.mode = SchemaGConf;
 			break;
 		case 0:				/* Returned when auto-set stuff is in effect */
 			break;
