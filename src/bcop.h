@@ -63,8 +63,12 @@ typedef enum {
 
 typedef enum {
 	CodeCompiz,
-	CodeNone
-} CodeType;
+	SchemaBegin,	//simply ensures everything before it
+			//is a code-type and everything after
+			//is a schema-type
+	SchemaGConf,
+	GenNone
+} GenType;
 
 #define SCREEN_EDGE_LEFT        0
 #define SCREEN_EDGE_RIGHT       1
@@ -193,7 +197,7 @@ typedef struct _Context {
 	char *name;
 	char *uName;
 	char *fUName;
-	CodeType mode;
+	GenType mode;
 	Option *options;
 } Context;
 
@@ -214,5 +218,7 @@ char * strToFirstUp(char *str);
 char * strToCamel(char *str);
 
 int genCode(char *src, char *hdr);
+
+int genSchema(char *sch);
 
 #endif

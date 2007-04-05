@@ -61,7 +61,7 @@ initData()
 {
 	data.name = NULL;
 	data.options = NULL;
-	data.mode = CodeNone;
+	data.mode = GenNone;
 }
 
 static OptionType get_Option_type(xmlChar * type)
@@ -864,9 +864,11 @@ static void usage(void)
 	printf("  -h, --help           display this help message\n");
 	printf("  -v, --version        print version information\n");
 	printf("  -c, --compiz         generate compiz compatible code\n");
+	printf("  -g, --gconf          generate gconf schema file\n");
 	printf("  -q, --quiet          don't print informational messages\n");
 	printf("      --source=<file>  source file name\n");
 	printf("      --header=<file>  header file name\n");
+	printf("      --schema=<file>  schema file name\n");
 }
 
 #define OPT_HELP 'h'
@@ -874,8 +876,10 @@ static void usage(void)
 #define OPT_BERYL 'b'
 #define OPT_COMPIZ 'c'
 #define OPT_QUIET 'q'
+#define OPT_GCONF 'g'
 #define OPT_SOURCE 1
 #define OPT_HEADER 2
+#define OPT_SCHEMA 3
 
 int main(int argc, char **argv)
 {
@@ -884,8 +888,9 @@ int main(int argc, char **argv)
 	programName = argv[0];
 	char *src = NULL;
 	char *hdr = NULL;
+	char *sch = NULL;
 
-	char sopts[] = "hvbcq";
+	char sopts[] = "hvbcqg";
 	struct option lopts[] = {
 		{"help", 0, 0, OPT_HELP},
 		{"version", 0, 0, OPT_VERSION},
@@ -893,6 +898,8 @@ int main(int argc, char **argv)
 		{"quiet", 0, &quiet, OPT_QUIET},
 		{"source", 1, 0, OPT_SOURCE},
 		{"header", 1, 0, OPT_HEADER},
+		{"gconf", 0, 0, OPT_GCONF},
+		{"schema", 1, 0, OPT_SCHEMA},
 		{0, 0, 0, 0}
 	};
 
@@ -916,12 +923,20 @@ int main(int argc, char **argv)
 			printf(PACKAGE_STRING "\n");
 			return 0;
 		case OPT_COMPIZ:
-			if (data.mode != CodeNone)
+			if (data.mode != GenNone)
 			{
-				fprintf(stderr,"%s: can only generate output for one composite manager\n",programName);
+				fprintf(stderr,"%s: can only generate output for one code/schema target\n",programName);
 				return 1;
 			}
 			data.mode = CodeCompiz;
+			break;
+		case OPT_GCONF:
+			if (data.mode != GenNone)
+			{
+				fprintf(stderr,"%s: can only generate output for one code/schema target\n",programName);
+				return 1;
+			}
+			data.mode = SchemaGConf;
 			break;
 		case OPT_SOURCE:
 			if (optarg)
@@ -930,6 +945,10 @@ int main(int argc, char **argv)
 		case OPT_HEADER:
 			if (optarg)
 				hdr = optarg;
+			break;
+		case OPT_SCHEMA:
+			if (optarg)
+			    sch = optarg;
 			break;
 		case 0:				/* Returned when auto-set stuff is in effect */
 			break;
@@ -942,7 +961,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (data.mode == CodeNone)
+	if (data.mode == GenNone)
 		data.mode = CodeCompiz;
 
 	fileName = argv[argc-1];
@@ -970,7 +989,7 @@ int main(int argc, char **argv)
 	parseOptionFile(doc);
 	if (!quiet) printf("done\n");
 
-	if (!src && !hdr)
+	if (data.mode<SchemaBegin && !src && !hdr)
 	{
 		char str[1024];
 		char *prefix = strtok(basename(strdup(fileName)),".");
@@ -981,10 +1000,22 @@ int main(int argc, char **argv)
 		sprintf(str,"%s_options.h",prefix);
 		hdr = strdup(str);
 	}
+	else if (data.mode>SchemaBegin && !sch)
+	{
+		char str[1024];
+		char *prefix = strtok(basename(strdup(fileName)),".");
+		if (!prefix || !strlen(prefix))
+			prefix = data.name;
+		sprintf(str,"%s.schema",prefix);
+		sch = strdup(str);
+	}
 
 	int rv = error;
 	if (!error)
-		rv = genCode(src,hdr);
+		if (data.mode < SchemaBegin)
+			rv = genCode(src,hdr);
+		else
+			rv = genSchema(sch);
 
     /*free the document */
     xmlFreeDoc(doc);
