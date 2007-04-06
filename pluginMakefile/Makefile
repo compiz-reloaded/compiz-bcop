@@ -20,9 +20,6 @@
 
 ## configuration
 
-#enter beryl or compiz here
-TARGET = beryl
-
 #enter plugin name here
 PLUGIN = xxx
 
@@ -30,6 +27,10 @@ PLUGIN = xxx
 PKG_DEP =
 
 ## end of configuration
+
+#enter beryl or compiz here
+TARGET = compiz
+
 
 DESTDIR = $(HOME)/.$(TARGET)/plugins
 
@@ -47,7 +48,6 @@ LDFLAGS = `pkg-config --libs $(PKG_DEP) $(TARGET) `
 bcop-target := $(shell if [ -e $(PLUGIN).options ]; then echo $(PLUGIN).options; fi )
 bcop-target-src := $(shell if [ -e $(PLUGIN).options ]; then echo $(PLUGIN)_options.c; fi )
 bcop-target-hdr := $(shell if [ -e $(PLUGIN).options ]; then echo $(PLUGIN)_options.h; fi )
-bcop-opt := $(shell if [ "$(TARGET)" = "compiz" ]; then echo "--compiz"; else echo "--beryl"; fi )
 
 # find all the object files (including those from .moc.cpp files)
 
@@ -95,7 +95,7 @@ $(DESTDIR) :
 	else \
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
-	@$(BCOP) $(bcop-opt) --quiet --header $@ $<
+	@$(BCOP) --quiet --header=$@ $<
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
@@ -106,7 +106,7 @@ $(DESTDIR) :
 	else \
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
-	@$(BCOP) $(bcop-opt) --quiet --source $@ $< 
+	@$(BCOP) --quiet --source=$@ $< 
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
