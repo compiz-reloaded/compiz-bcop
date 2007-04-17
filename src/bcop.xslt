@@ -1022,7 +1022,7 @@ void </xsl:text>
         </xsl:if>
         <xsl:if test="@type = 'list' and ./allowed/value and ./type/text() = 'string'">
             <xsl:text>            int i,j;
-</xsl:text>
+            </xsl:text>
             <xsl:call-template name="privateName"/>
             <xsl:text>-></xsl:text>
             <xsl:value-of select="@name"/>
