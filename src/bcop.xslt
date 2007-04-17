@@ -872,7 +872,7 @@ void </xsl:text>
             <xsl:value-of select="@name"/>
             <xsl:text> = 0;
         for (i = 0; i &lt; o->value.list.nValue; i++)
-            for (j = 0; j &lt; o->value.rest.s.nString; j++);
+            for (j = 0; j &lt; o->rest.s.nString; j++)
                 if (!strcmp (o->value.list.value[i].s, o->rest.s.string[j]))
                 </xsl:text>
             <xsl:call-template name="privateName"/>
@@ -1028,7 +1028,7 @@ void </xsl:text>
             <xsl:value-of select="@name"/>
             <xsl:text> = 0;
             for (i = 0; i &lt; o->value.list.nValue; i++)
-                for (j = 0; j &lt; o->value.rest.s.nString; j++); 
+                for (j = 0; j &lt; o->rest.s.nString; j++)
                     if (!strcmp (o->value.list.value[i].s, o->rest.s.string[j]))
                     </xsl:text>
             <xsl:call-template name="privateName"/>
