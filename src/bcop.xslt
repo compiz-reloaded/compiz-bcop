@@ -709,7 +709,7 @@ void </xsl:text>
                     <xsl:call-template name="privateName"/>
                     <xsl:text>-></xsl:text>
                     <xsl:value-of select="@name"/>
-                    <xsl:text>
+                    <xsl:text>;
 }
 
 </xsl:text>
