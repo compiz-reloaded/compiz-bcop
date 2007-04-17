@@ -47,7 +47,7 @@
     <xsl:template name="PrintCamel">
         <xsl:param name="text"/>
         <xsl:variable name="textconv">
-            <xsl:value-of select="translate($text,' +-','___')"/>
+            <xsl:value-of select="translate($text,' +-/\','_____')"/>
         </xsl:variable>
 	<xsl:if test="string-length($textconv)">
 	    <xsl:if test="contains($textconv,'_')">
