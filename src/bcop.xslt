@@ -330,7 +330,6 @@ typedef struct _</xsl:text>
         <xsl:text>OptionsScreen;
 
 </xsl:text>
-        <xsl:call-template name="printMetadataFallback"/>
         <xsl:call-template name="printFunctions"/>
         <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
             <xsl:call-template name="initDisplayOptions"/>
@@ -373,72 +372,6 @@ typedef struct _</xsl:text>
     </xsl:template>
 
 <!-- print get/set functions -->
-
-    <xsl:template name="printMetadataFallback">
-        <xsl:text>char </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>StaticMetadata[] = {
- "&lt;compiz&gt;"
- "    &lt;plugin name=\"</xsl:text>
-        <xsl:value-of select="$pName"/>
-        <xsl:text>\"&gt;"
-</xsl:text>
-        <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
-            <xsl:text> "        &lt;display&gt;"
-</xsl:text>
-            <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option">
-		<xsl:text> "            &lt;option name=\"</xsl:text>
-		<xsl:value-of select="@name"/>
-		<xsl:text>\" type=\"</xsl:text>
-		<xsl:value-of select="@type"/>
-                <xsl:choose>
-                    <xsl:when test="@type = 'list' and ./type/text()">
-                        <xsl:text>\"&gt;"
- "                &lt;type&gt;</xsl:text>
-                        <xsl:value-of select="./type/text()"/>
-                        <xsl:text>&lt;/type&gt;"
-</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>\"/&gt;"
-</xsl:text>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:for-each>
-            <xsl:text> "        &lt;/display&gt;"
-</xsl:text>
-        </xsl:if>
-        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
-            <xsl:text> "        &lt;screen&gt;"
-</xsl:text>
-            <xsl:for-each select="/compiz/plugin[@name=$pName]/screen//option">
-		<xsl:text> "            &lt;option name=\"</xsl:text>
-		<xsl:value-of select="@name"/>
-		<xsl:text>\" type=\"</xsl:text>
-		<xsl:value-of select="@type"/>
-                <xsl:choose>
-                    <xsl:when test="@type = 'list' and ./type/text()">
-                        <xsl:text>\"&gt;"
- "                &lt;type&gt;</xsl:text>
-                        <xsl:value-of select="./type/text()"/>
-                        <xsl:text>&lt;/type&gt;"
-</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>\"/&gt;"
-</xsl:text>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:for-each>
-            <xsl:text> "        &lt;/screen&gt;"
-</xsl:text>
-        </xsl:if>
-        <xsl:text> "    &lt;/plugin&gt;"
- "&lt;/compiz&gt;"
-};
-
-</xsl:text>        
-    </xsl:template>
 
     <xsl:template name="printFunctions">
         <xsl:for-each select="/compiz/plugin[@name=$pName]//option">
@@ -790,103 +723,36 @@ void </xsl:text>
 <!-- initialze option functions generation -->
 
     <xsl:template name="initDisplayOptions">
-        <xsl:text>static void </xsl:text>
+        <xsl:text>static const CompMetadataOptionInfo </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsDisplayInitOptions (CompDisplay *d)
-{
-    </xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_DISPLAY(d);
-   CompOption *o;
-
+        <xsl:text>OptionsDisplayOptionInfo[] = {
 </xsl:text>
         <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option">
             <xsl:call-template name="initOption"/>
         </xsl:for-each>
-        <xsl:text>}
+        <xsl:text>};
 
 </xsl:text>
     </xsl:template>
 
     <xsl:template name="initScreenOptions">
-        <xsl:text>static void </xsl:text>
+        <xsl:text>static const CompMetadataOptionInfo </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsScreenInitOptions (CompScreen *s)
-{
-    </xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_SCREEN(s);
-    CompOption *o;
-
+        <xsl:text>OptionsScreenOptionInfo[] = {
 </xsl:text>
         <xsl:for-each select="/compiz/plugin[@name=$pName]/screen//option">
             <xsl:call-template name="initOption"/>
         </xsl:for-each>
-        <xsl:text>}
+        <xsl:text>};
 
 </xsl:text>
     </xsl:template>
-
     <xsl:template name="initOption">
-        <xsl:text>    o = &amp;</xsl:text>
-        <xsl:call-template name="privateName"/>
-        <xsl:text>->opt[</xsl:text>
-        <xsl:call-template name="printOptionsEnumName"/>
-        <xsl:text>];
-    compInit</xsl:text>
-        <xsl:call-template name="screenOrDisplay"/>
-        <xsl:text>OptionFromMetadata (</xsl:text>
-        <xsl:if test="ancestor::display">
-            <xsl:text>d</xsl:text>
-        </xsl:if>
-        <xsl:if test="ancestor::screen">
-            <xsl:text>s</xsl:text>
-        </xsl:if>
-        <xsl:text>, &amp;</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsMetadata, o, "</xsl:text>
+        <xsl:text>    { "</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text>");
-</xsl:text>
-        <xsl:if test="@type = 'string' and ./allowed/value">
-            <xsl:text>    {
-        int        i;
-        </xsl:text>
-            <xsl:call-template name="privateName"/>
-            <xsl:text>-></xsl:text>
-            <xsl:value-of select="@name"/>
-            <xsl:text> = 0;
-        for (i = 0; i &lt; o->rest.s.nString; i++)
-            if (!strcmp (o->value.s, o->rest.s.string[i]))
-                </xsl:text>
-            <xsl:call-template name="privateName"/>
-            <xsl:text>-></xsl:text>
-            <xsl:value-of select="@name"/>
-            <xsl:text> = i;
-    }
-</xsl:text>
-        </xsl:if>
-        <xsl:if test="@type = 'list' and ./allowed/value and ./type/text() = 'string'">
-            <xsl:text>    {
-        int        i,j;
-        </xsl:text>
-            <xsl:call-template name="privateName"/>
-            <xsl:text>-></xsl:text>
-            <xsl:value-of select="@name"/>
-            <xsl:text> = 0;
-        for (i = 0; i &lt; o->value.list.nValue; i++)
-            for (j = 0; j &lt; o->rest.s.nString; j++)
-                if (!strcmp (o->value.list.value[i].s, o->rest.s.string[j]))
-                </xsl:text>
-            <xsl:call-template name="privateName"/>
-            <xsl:text>-></xsl:text>
-            <xsl:value-of select="@name"/>
-            <xsl:text> |= (1 &lt;&lt; j);
-    }
-</xsl:text>
-        </xsl:if>
-<xsl:text>
-        
+        <xsl:text>", "</xsl:text>
+        <xsl:value-of select="@type"/>
+        <xsl:text>", 0, 0, 0 },
 </xsl:text>
     </xsl:template>
 
@@ -1074,7 +940,20 @@ void </xsl:text>
     </xsl:text>
         <xsl:value-of select="$Plugin"/>
         <xsl:text>OptionsScreen *os;
-
+    </xsl:text>
+        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option[@type = 'string']/allowed/value or
+        (/compiz/plugin[@name=$pName]/screen//option[@type = 'list']/allowed/value and
+        /compiz/plugin[@name=$pName]/screen//option[@type = 'list']/type/text() = 'string')">
+            <xsl:text>CompOption *o;
+    int i;
+    </xsl:text>
+        </xsl:if>
+        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option[@type = 'list']/allowed/value and
+        /compiz/plugin[@name=$pName]/screen//option[@type = 'list']/type/text() = 'string'">
+            <xsl:text>int j;
+    </xsl:text>
+        </xsl:if>
+        <xsl:text>
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_DISPLAY (s->display);
@@ -1089,11 +968,61 @@ void </xsl:text>
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
+            <xsl:text>if (!compInitScreenOptionsFromMetadata (s, &amp;</xsl:text>
             <xsl:value-of select="$plugin"/>
-            <xsl:text>OptionsScreenInitOptions (s);
+            <xsl:text>OptionsMetadata, </xsl:text>
+            <xsl:value-of select="$plugin"/>
+            <xsl:text>OptionsScreenOptionInfo, os->opt, </xsl:text>
+            <xsl:value-of select="$Plugin"/>
+            <xsl:text>ScreenOptionNum))
+    {
+        free (os);
+        return FALSE;
+    }
+</xsl:text>
+        </xsl:if>
+        <xsl:for-each select="/compiz/plugin[@name=$pName]/screen//option">
+            <xsl:if test="@type = 'string' and ./allowed/value">
+            <xsl:text>    o = &amp;os->opt[</xsl:text>
+            <xsl:call-template name="printOptionsEnumName"/>
+            <xsl:text>];
+    </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+    for (i = 0; i &lt; o->rest.s.nString; i++)
+        if (!strcmp (o->value.s, o->rest.s.string[i]))
+            </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = i;
 
 </xsl:text>
         </xsl:if>
+        <xsl:if test="@type = 'list' and ./allowed/value and ./type/text() = 'string'">
+            <xsl:text>    o = &amp;os->opt[</xsl:text>
+            <xsl:call-template name="printOptionsEnumName"/>
+            <xsl:text>];
+    </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+    for (i = 0; i &lt; o->value.list.nValue; i++)
+        for (j = 0; j &lt; o->rest.s.nString; j++)
+            if (!strcmp (o->value.list.value[i].s, o->rest.s.string[j]))
+            </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> |= (1 &lt;&lt; j);
+
+</xsl:text>
+        </xsl:if>
+        </xsl:for-each>
+
         <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option[@type = 'action']">
             <xsl:text>    addScreenAction (s, &amp;od->opt[</xsl:text>
             <xsl:call-template name="printOptionsEnumName"/>
@@ -1140,6 +1069,14 @@ static void </xsl:text>
             <xsl:text>].value.action);
 </xsl:text>
         </xsl:for-each>
+        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
+            <xsl:text>
+    compFiniScreenOptions (s, os->opt, </xsl:text>
+            <xsl:value-of select="$Plugin"/>
+            <xsl:text>ScreenOptionNum);
+
+</xsl:text>
+        </xsl:if>
         <xsl:text>    free (os);
 }
 
@@ -1156,7 +1093,22 @@ static void </xsl:text>
     </xsl:text>
         <xsl:value-of select="$Plugin"/>
         <xsl:text>OptionsDisplay *od;
-
+   </xsl:text>
+        <xsl:if test="/compiz/plugin[@name=$pName]/display//option[@type = 'string']/allowed/value or
+        (/compiz/plugin[@name=$pName]/display//option[@type = 'list']/allowed/value and
+        /compiz/plugin[@name=$pName]/display//option[@type = 'list']/type/text() = 'string')">
+            <xsl:text>CompOption *o;
+    int i;
+    </xsl:text>
+        </xsl:if>
+        <xsl:if test="/compiz/plugin[@name=$pName]/display//option[@type = 'list']/allowed/value and
+        /compiz/plugin[@name=$pName]/display//option[@type = 'list']/type/text() = 'string'">
+            <xsl:text>int j;
+    </xsl:text>
+        </xsl:if>
+        <xsl:text>
+    </xsl:text>
+        <xsl:text>
     od = calloc (1, sizeof(</xsl:text>
         <xsl:value-of select="$Plugin"/>
         <xsl:text>OptionsDisplay));
@@ -1174,11 +1126,60 @@ static void </xsl:text>
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
+            <xsl:text>if (!compInitDisplayOptionsFromMetadata (d, &amp;</xsl:text>
             <xsl:value-of select="$plugin"/>
-            <xsl:text>OptionsDisplayInitOptions (d);
+            <xsl:text>OptionsMetadata, </xsl:text>
+            <xsl:value-of select="$plugin"/>
+            <xsl:text>OptionsDisplayOptionInfo, od->opt, </xsl:text>
+            <xsl:value-of select="$Plugin"/>
+            <xsl:text>DisplayOptionNum))
+    {
+        free (od);
+        return FALSE;
+    }
+</xsl:text>
+        </xsl:if>
+        <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option">
+            <xsl:if test="@type = 'string' and ./allowed/value">
+            <xsl:text>    o = &amp;od->opt[</xsl:text>
+            <xsl:call-template name="printOptionsEnumName"/>
+            <xsl:text>];
+    </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+    for (i = 0; i &lt; o->rest.s.nString; i++)
+        if (!strcmp (o->value.s, o->rest.s.string[i]))
+            </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = i;
 
 </xsl:text>
         </xsl:if>
+        <xsl:if test="@type = 'list' and ./allowed/value and ./type/text() = 'string'">
+            <xsl:text>    o = &amp;od->opt[</xsl:text>
+            <xsl:call-template name="printOptionsEnumName"/>
+            <xsl:text>];
+    </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+    for (i = 0; i &lt; o->value.list.nValue; i++)
+        for (j = 0; j &lt; o->rest.s.nString; j++)
+            if (!strcmp (o->value.list.value[i].s, o->rest.s.string[j]))
+            </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> |= (1 &lt;&lt; j);
+
+</xsl:text>
+        </xsl:if>
+        </xsl:for-each>
         <xsl:text>    if (</xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable &amp;&amp; </xsl:text>
@@ -1208,8 +1209,16 @@ static void </xsl:text>
         <xsl:text>_OPTIONS_DISPLAY (d);
 
     freeScreenPrivateIndex(d, od->screenPrivateIndex);
+</xsl:text>
+       <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
+            <xsl:text>
+    compFiniDisplayOptions (d, od->opt, </xsl:text>
+            <xsl:value-of select="$Plugin"/>
+            <xsl:text>DisplayOptionNum);
 
-    free (od);
+</xsl:text>
+        </xsl:if>
+        <xsl:text>    free (od);
 }
 
 </xsl:text>
@@ -1226,17 +1235,34 @@ static void </xsl:text>
     if (displayPrivateIndex &lt; 0)
         return FALSE;
 
-    if (!compInitPluginMetadata (&amp;</xsl:text>
+    if (!compInitPluginMetadataFromInfo (&amp;</xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsMetadata, "</xsl:text>
         <xsl:value-of select="$pName"/>
-        <xsl:text>"))
-        return FALSE;
-    if (!compAddMetadataFromString (&amp;</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsMetadata, </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>StaticMetadata))
+        <xsl:text>",</xsl:text>
+        <xsl:choose>
+            <xsl:when test="/compiz/plugin[@name=$pName]/display//option">
+                <xsl:value-of select="$plugin"/>
+                <xsl:text>OptionsDisplayOptionInfo, </xsl:text>
+                <xsl:value-of select="$Plugin"/>
+                <xsl:text>DisplayOptionNum, </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>0, 0, </xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="/compiz/plugin[@name=$pName]/screen//option">
+                <xsl:value-of select="$plugin"/>
+                <xsl:text>OptionsScreenOptionInfo, </xsl:text>
+                <xsl:value-of select="$Plugin"/>
+                <xsl:text>ScreenOptionNum</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>0, 0</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+<xsl:text>))
         return FALSE;
 
     compAddMetadataFromFile (&amp;</xsl:text>
@@ -1282,6 +1308,17 @@ static void </xsl:text>
 <!-- vtable generation -->
 
     <xsl:template name="getVTable">
+        <xsl:text>static CompMetadata *
+</xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsGetMetadata (CompPlugin *plugin)
+{
+    return &amp;</xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsMetadata;
+}
+
+</xsl:text>
         <xsl:text>CompPluginVTable *getCompPluginInfo (void)
 {
     if (!</xsl:text>
@@ -1298,6 +1335,12 @@ static void </xsl:text>
         <xsl:text>OptionsVTable, </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable, sizeof(CompPluginVTable));
+        </xsl:text>
+
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsVTable.getMetadata = </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsGetMetadata;
         </xsl:text>
 
         <xsl:value-of select="$plugin"/>
