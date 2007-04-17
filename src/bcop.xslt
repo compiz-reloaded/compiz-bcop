@@ -848,6 +848,17 @@ void </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>");
 </xsl:text>
+        <xsl:if test="@type = 'match'">
+            <xsl:text>    matchUpdate (</xsl:text>
+            <xsl:if test="ancestor::display">
+                <xsl:text>d</xsl:text>
+	    </xsl:if>
+	    <xsl:if test="ancestor::screen">
+		<xsl:text>s->display</xsl:text>
+	    </xsl:if>
+            <xsl:text>, &amp;o->value.match);
+</xsl:text>
+        </xsl:if>
         <xsl:if test="@type = 'string' and ./allowed/value">
             <xsl:text>    {
         int        i;
