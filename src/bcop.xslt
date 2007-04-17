@@ -1520,10 +1520,6 @@ CompOption *</xsl:text>
 </xsl:text>
             </xsl:for-each>
             <xsl:text>
-</xsl:text>
-            <xsl:value-of select="$plugin"/>
-            <xsl:call-template name="printOptionName"/>
-            <xsl:text>Enum;
 
 </xsl:text>
         </xsl:for-each>
