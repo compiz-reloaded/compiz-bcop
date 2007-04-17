@@ -536,7 +536,7 @@ typedef struct _</xsl:text>
 {
     </xsl:text>
                     <xsl:call-template name="initPrivate"/>
-                    <xsl:text>    return </xsl:text>
+                    <xsl:text>    return &amp;</xsl:text>
                     <xsl:call-template name="privateName"/>
                     <xsl:text>->opt[</xsl:text>
                     <xsl:call-template name="printOptionsEnumName"/>
