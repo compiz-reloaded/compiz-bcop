@@ -851,11 +851,14 @@ void </xsl:text>
         <xsl:if test="@type = 'string' and ./allowed/value">
             <xsl:text>    {
         int        i;
-        for (i = 0; i &lt; </xsl:text>
-            <xsl:call-template name="printOptionName"/>
-            <xsl:text>Num; i++)
+        </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+        for (i = 0; i &lt; o->rest.s.nString; i++)
             if (!strcmp (o->value.s, o->rest.s.string[i]))
-            </xsl:text>
+                </xsl:text>
             <xsl:call-template name="privateName"/>
             <xsl:text>-></xsl:text>
             <xsl:value-of select="@name"/>
@@ -1009,9 +1012,7 @@ void </xsl:text>
 </xsl:text>
         <xsl:if test="@type = 'string' and ./allowed/value">
             <xsl:text>            int i;
-            for (i = 0; i &lt; </xsl:text>
-            <xsl:call-template name="printOptionName"/>
-            <xsl:text>Num; i++)
+            for (i = 0; i &lt; o->rest.s.nString; i++)
                 if (!strcmp (o->value.s, o->rest.s.string[i]))
                     </xsl:text>
             <xsl:call-template name="privateName"/>
