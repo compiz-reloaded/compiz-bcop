@@ -33,6 +33,7 @@ TARGET = compiz
 
 
 DESTDIR = $(HOME)/.$(TARGET)/plugins
+XMLDIR = $(HOME)/.$(TARGET)/metadata
 
 BUILDDIR = build
 
@@ -45,9 +46,11 @@ BCOP       = `pkg-config --variable=bin bcop`
 CFLAGS  = -g -Wall `pkg-config --cflags $(PKG_DEP) $(TARGET) `
 LDFLAGS = `pkg-config --libs $(PKG_DEP) $(TARGET) `
 
-bcop-target := $(shell if [ -e $(PLUGIN).options ]; then echo $(PLUGIN).options; fi )
-bcop-target-src := $(shell if [ -e $(PLUGIN).options ]; then echo $(PLUGIN)_options.c; fi )
-bcop-target-hdr := $(shell if [ -e $(PLUGIN).options ]; then echo $(PLUGIN)_options.h; fi )
+is-bcop-target := $(shell if [ -e $(PLUGIN).xml ]; then cat $(PLUGIN).xml | grep "useBcop=\"true\"";fi )
+
+bcop-target := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN).xml; fi )
+bcop-target-src := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN)_options.c; fi )
+bcop-target-hdr := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN)_options.h; fi )
 
 # find all the object files (including those from .moc.cpp files)
 
@@ -89,24 +92,26 @@ $(DESTDIR) :
 #
 # BCOP'ing
 
-%_options.h: %.options
+%_options.h: %.xml
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e -n "\033[0;1;5mbcop'ing  \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
 	else \
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
-	@$(BCOP) --quiet --header=$@ $<
+	@$(BCOP) --header=$@ $<
+	touch $@
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
 
-%_options.c: %.options
+%_options.c: %.xml
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e -n "\033[0;1;5mbcop'ing  \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
 	else \
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
-	@$(BCOP) --quiet --source=$@ $< 
+	@$(BCOP) --source=$@ $< 
+	touch $@
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
@@ -161,5 +166,18 @@ install: $(DESTDIR) all
 	@if [ '$(color)' != 'no' ]; then \
 	    echo -e "\r\033[0minstall   : \033[34m$(DESTDIR)/lib$(PLUGIN).so\033[0m"; \
 	fi
+	@if [ -e $(PLUGIN).xml ]; then \
+	    if [ '$(color)' != 'no' ]; then \
+		echo -n -e "\033[0;1;5minstall   \033[0;1;37m: \033[0;31m$(XMLDIR)/$(PLUGIN).xml\033[0m"; \
+	    else \
+		echo "install   : $(XMLDIR)/$(PLUGIN).xml"; \
+	    fi; \
+	    mkdir -p $(XMLDIR); \
+	    $(INSTALL) $(PLUGIN).xml $(XMLDIR)/$(PLUGIN).xml; \
+	    if [ '$(color)' != 'no' ]; then \
+		echo -e "\r\033[0minstall   : \033[34m$(XMLDIR)/$(PLUGIN).xml\033[0m"; \
+	    fi; \
+	fi
+	
 
 

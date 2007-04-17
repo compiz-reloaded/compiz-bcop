@@ -16,14 +16,12 @@ AC_HEADER_STDC
 
 AC_C_BIGENDIAN
 
-PKG_CHECK_MODULES(LIBXML2, "libxml-2.0")
-AC_SUBST(LIBXML2_REQUIRES)
-
-PKG_CHECK_MODULES(X11, "x11")
-AC_SUBST(X11_REQUIRES)
+xsltdir=$datadir/bcop
+AC_SUBST(xsltdir)
 
 AC_OUTPUT([
 bcop.pc
 Makefile
 src/Makefile
+src/bcop
 ])
