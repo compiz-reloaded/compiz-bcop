@@ -1124,9 +1124,11 @@ static void </xsl:text>
         <xsl:text>PluginVTable->finiScreen (p, s);
 
     </xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_DISPLAY (s->display);
+        <xsl:if test="/compiz/plugin[@name=$pName]/display//option[@type = 'action']">
+            <xsl:value-of select="$PLUGIN"/>
+            <xsl:text>_OPTIONS_DISPLAY (s->display);
     </xsl:text>
+        </xsl:if>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_SCREEN (s);
 
