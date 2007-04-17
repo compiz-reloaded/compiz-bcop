@@ -1231,7 +1231,7 @@ static void </xsl:text>
         <xsl:value-of select="$pName"/>
         <xsl:text>"))
         return FALSE;
-    if (compAddMetadataFromString (&amp;</xsl:text>
+    if (!compAddMetadataFromString (&amp;</xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsMetadata, </xsl:text>
         <xsl:value-of select="$plugin"/>
