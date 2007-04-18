@@ -21,7 +21,7 @@
 prefix=@prefix@
 xsltdir=@xsltdir@
 
-function usage()
+function usage
 {
     echo "Usage: $0 [options] <options file>"
     echo "Options:"
