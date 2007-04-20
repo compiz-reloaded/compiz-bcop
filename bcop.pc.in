@@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 bin=@exec_prefix@/bin/bcop
+xsltpath=@datadir@/bcop
 
 Name: bcop
 Description: Compiz option code generator

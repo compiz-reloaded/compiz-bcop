@@ -18,8 +18,7 @@
 #  GNU General Public License for more details.
 #
 
-prefix=@prefix@
-xsltdir=@xsltdir@
+xsltdir=`pkg-config --variable xsltpath bcop`
 
 function usage
 {
