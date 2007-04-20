@@ -123,7 +123,7 @@
     <xsl:param name="header">false</xsl:param>
     <xsl:param name="source">false</xsl:param>
     <xsl:param name="filename"><xsl:value-of select="$pName"/><xsl:text>_options.h</xsl:text></xsl:param>
-    <xsl:param name="metaname"><xsl:value-of select="$plugin"/></xsl:param>
+    <xsl:param name="metaname"><xsl:value-of select="$pName"/></xsl:param>
 
 
 <!-- global helper functions -->
