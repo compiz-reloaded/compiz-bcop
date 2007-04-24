@@ -171,7 +171,7 @@ install: $(DESTDIR) all
 		echo "install   : $(XMLDIR)/$(PLUGIN).xml"; \
 	    fi; \
 	    mkdir -p $(XMLDIR); \
-	    $(INSTALL) $(PLUGIN).xml $(XMLDIR)/$(PLUGIN).xml; \
+	    cp $(PLUGIN).xml $(XMLDIR)/$(PLUGIN).xml; \
 	    if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0minstall   : \033[34m$(XMLDIR)/$(PLUGIN).xml\033[0m"; \
 	    fi; \
