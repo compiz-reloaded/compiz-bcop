@@ -99,7 +99,6 @@ $(DESTDIR) :
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
 	@$(BCOP) --header=$@ $<
-	touch $@
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
@@ -111,7 +110,6 @@ $(DESTDIR) :
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
 	@$(BCOP) --source=$@ $< 
-	touch $@
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
