@@ -16,6 +16,8 @@ AC_HEADER_STDC
 
 AC_C_BIGENDIAN
 
+PKG_CHECK_MODULES(LIBXSLT, libxslt)
+
 xsltdir=$datadir/bcop
 AC_SUBST(xsltdir)
 
