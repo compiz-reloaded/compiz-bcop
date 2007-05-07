@@ -31,9 +31,13 @@ PKG_DEP =
 #enter beryl or compiz here
 TARGET = compiz
 
-
-DESTDIR = $(HOME)/.$(TARGET)/plugins
-XMLDIR = $(HOME)/.$(TARGET)/metadata
+ifeq ($(BUILD_GLOBAL),true)
+    DESTDIR = $(shell pkg-config --variable=libdir compiz)/compiz
+    XMLDIR = $(shell pkg-config --variable=prefix compiz)/share/compiz/metadata
+else
+    DESTDIR = $(HOME)/.$(TARGET)/plugins
+    XMLDIR = $(HOME)/.$(TARGET)/metadata
+endif
 
 BUILDDIR = build
 
@@ -52,6 +56,10 @@ bcop-target := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN).xml; f
 bcop-target-src := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN)_options.c; fi )
 bcop-target-hdr := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN)_options.h; fi )
 
+gen-schemas := $(shell if [ -e $(PLUGIN).xml ] && [ -n `pkg-config --variable=xsltdir compiz-gconf` ]; then echo true; fi )
+schema-target := $(shell if [ -n "$(gen-schemas)" ]; then echo $(PLUGIN).xml; fi )
+schema-output := $(shell if [ -n "$(gen-schemas)" ]; then echo compiz-$(PLUGIN).schema; fi )
+
 # find all the object files (including those from .moc.cpp files)
 
 c-objs := $(patsubst %.c,%.lo,$(shell find -name '*.c' 2> /dev/null | grep -v "$(BUILDDIR)/" | sed -e 's/^.\///'))
@@ -64,16 +72,17 @@ inc-path-param = $(shell if [ -z "`gcc --version | head -n 1 | grep ' 3'`" ]; th
 # default color settings
 color := $(shell if [ $$TERM = "dumb" ]; then echo "no"; else echo "yes"; fi)
 
-
 #
 # Do it.
 #
 
-.PHONY: $(BUILDDIR) build-dir bcop-build c-build-objs c-link-plugin
+.PHONY: $(BUILDDIR) build-dir bcop-build schema-creation c-build-objs c-link-plugin
 
-all: $(BUILDDIR) build-dir bcop-build c-build-objs c-link-plugin
+all: $(BUILDDIR) build-dir bcop-build schema-creation c-build-objs c-link-plugin
 
 bcop-build:   $(bcop-target-hdr) $(bcop-target-src)
+
+schema-creation: $(schema-output)
 
 c-build-objs: $(addprefix $(BUILDDIR)/,$(cxx-objs))
 
@@ -99,7 +108,6 @@ $(DESTDIR) :
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
 	@$(BCOP) --header=$@ $<
-	touch $@
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
@@ -110,11 +118,25 @@ $(DESTDIR) :
 	else \
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
-	@$(BCOP) --source=$@ $< 
-	touch $@
+	@$(BCOP) --source=$@ $<
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
+
+#
+# Schema generation
+
+compiz-%.schema: %.xml
+	@if [ '$(color)' != 'no' ]; then \
+		echo -e -n "\033[0;1;5mschema    \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
+	else \
+		echo "schema'ing  $<  ->  $@"; \
+	fi
+	@xsltproc `pkg-config --variable=xsltdir compiz-gconf`/schemas.xslt $< > $@
+	@if [ '$(color)' != 'no' ]; then \
+		echo -e "\r\033[0mschema    : \033[34m$< -> $@\033[0m"; \
+	fi
+
 
 
 #
@@ -140,13 +162,13 @@ cxx-rpath-prefix := -Wl,-rpath,
 
 $(BUILDDIR)/lib$(PLUGIN).la: $(addprefix $(BUILDDIR)/,$(c-objs))
 	@if [ '$(color)' != 'no' ]; then \
-		echo -e -n "\033[0;1;5mlinking -> \033[0;31m$@\033[0m"; \
+		echo -e -n "\033[0;1;5mlinking  -> \033[0;31m$@\033[0m"; \
 	else \
-		echo "linking -> $@"; \
+		echo "linking  -> $@"; \
 	fi
 	@$(LIBTOOL) --quiet --mode=link $(CC) $(LDFLAGS) -rpath $(DESTDIR) -o $@ $(addprefix $(BUILDDIR)/,$(c-objs))
 	@if [ '$(color)' != 'no' ]; then \
-		echo -e "\r\033[0mlinking -> \033[34m$@\033[0m"; \
+		echo -e "\r\033[0mlinking  -> \033[34m$@\033[0m"; \
 	fi
 
 
@@ -154,6 +176,7 @@ clean:
 	rm -rf $(BUILDDIR)
 	rm -f $(bcop-target-src)
 	rm -f $(bcop-target-hdr)
+	rm -f $(schema-output)
 
 install: $(DESTDIR) all
 	@if [ '$(color)' != 'no' ]; then \
@@ -178,6 +201,18 @@ install: $(DESTDIR) all
 		echo -e "\r\033[0minstall   : \033[34m$(XMLDIR)/$(PLUGIN).xml\033[0m"; \
 	    fi; \
 	fi
-	
+	@if [ -e $(schema-output) ]; then \
+	    if [ '$(color)' != 'no' ]; then \
+		echo -n -e "\033[0;1;5minstall   \033[0;1;37m: \033[0;31m$(schema-output)\033[0m"; \
+	    else \
+		echo "install   : $(schema-output)"; \
+	    fi; \
+	    gconftool-2 --install-schema-file=$(schema-output) > /dev/null; \
+	    if [ '$(color)' != 'no' ]; then \
+		echo -e "\r\033[0minstall   : \033[34m$(schema-output)\033[0m"; \
+	    fi; \
+	fi
+
+
 
 
