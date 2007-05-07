@@ -1,9 +1,9 @@
 ##
 #
-# Beryl/Compiz plugin Makefile
+# Compiz plugin Makefile
 #
 # Copyright : (C) 2006 by Dennis Kasprzyk
-# E-mail    : dennis.kasprzyk@rwth-aachen.de
+# E-mail    : onestone@deltatauchi.de
 #
 #
 # This program is free software; you can redistribute it and/or
@@ -118,7 +118,7 @@ $(DESTDIR) :
 	else \
 		echo "bcop'ing  $<  ->  $@"; \
 	fi
-	@$(BCOP) --source=$@ $<
+	@$(BCOP) --source=$@ $< 
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
@@ -196,7 +196,7 @@ install: $(DESTDIR) all
 		echo "install   : $(XMLDIR)/$(PLUGIN).xml"; \
 	    fi; \
 	    mkdir -p $(XMLDIR); \
-	    $(INSTALL) $(PLUGIN).xml $(XMLDIR)/$(PLUGIN).xml; \
+	    cp $(PLUGIN).xml $(XMLDIR)/$(PLUGIN).xml; \
 	    if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0minstall   : \033[34m$(XMLDIR)/$(PLUGIN).xml\033[0m"; \
 	    fi; \

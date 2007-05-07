@@ -123,7 +123,7 @@
     <xsl:param name="header">false</xsl:param>
     <xsl:param name="source">false</xsl:param>
     <xsl:param name="filename"><xsl:value-of select="$pName"/><xsl:text>_options.h</xsl:text></xsl:param>
-    <xsl:param name="metaname"><xsl:value-of select="$plugin"/></xsl:param>
+    <xsl:param name="metaname"><xsl:value-of select="$pName"/></xsl:param>
 
 
 <!-- global helper functions -->
@@ -866,8 +866,11 @@ void </xsl:text>
         <xsl:text>:
         if (</xsl:text>
         <xsl:choose>
-            <xsl:when test="@type='action'">
-                <xsl:text>setDisplayAction (d, o, value))</xsl:text>
+            <xsl:when test="ancestor::display">
+                <xsl:text>compSetDisplayOption (d, o, value))</xsl:text>
+            </xsl:when>
+	    <xsl:when test="ancestor::screen">
+                <xsl:text>compSetScreenOption (s, o, value))</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text>compSetOption (o, value))</xsl:text>
@@ -1023,12 +1026,6 @@ void </xsl:text>
         </xsl:if>
         </xsl:for-each>
 
-        <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option[@type = 'action']">
-            <xsl:text>    addScreenAction (s, &amp;od->opt[</xsl:text>
-            <xsl:call-template name="printOptionsEnumName"/>
-            <xsl:text>].value.action);
-</xsl:text>
-        </xsl:for-each>
         <xsl:text>    if (</xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable &amp;&amp; </xsl:text>
@@ -1054,21 +1051,10 @@ static void </xsl:text>
         <xsl:text>PluginVTable->finiScreen (p, s);
 
     </xsl:text>
-        <xsl:if test="/compiz/plugin[@name=$pName]/display//option[@type = 'action']">
-            <xsl:value-of select="$PLUGIN"/>
-            <xsl:text>_OPTIONS_DISPLAY (s->display);
-    </xsl:text>
-        </xsl:if>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_SCREEN (s);
 
 </xsl:text>
-        <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option[@type = 'action']">
-            <xsl:text>    removeScreenAction (s, &amp;od->opt[</xsl:text>
-            <xsl:call-template name="printOptionsEnumName"/>
-            <xsl:text>].value.action);
-</xsl:text>
-        </xsl:for-each>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
             <xsl:text>
     compFiniScreenOptions (s, os->opt, </xsl:text>
