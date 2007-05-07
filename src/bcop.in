@@ -55,7 +55,7 @@ done
 
 if [ ! -e $xsltdir/bcop.xslt ]; then
     echo -n "The needed stylesheet $xsltdir/bcop.xslt was not found. Aborting..."
-    exit
+    exit 1
 fi
 
 xmlfile="$1"
