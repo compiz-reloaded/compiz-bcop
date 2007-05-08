@@ -96,7 +96,7 @@ $(BUILDDIR) :
 	@mkdir -p $(BUILDDIR)
 
 $(DESTDIR) :
-	@mkdir -p q$(DESTDIR)
+	@mkdir -p $(DESTDIR)
 
 #
 # BCOP'ing
