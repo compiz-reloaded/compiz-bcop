@@ -33,7 +33,7 @@ TARGET = compiz
 
 ifeq ($(BUILD_GLOBAL),true)
     DESTDIR = $(shell pkg-config --variable=libdir compiz)/compiz
-    XMLDIR = $(shell pkg-config --variable=prefix compiz)/share/compiz/metadata
+    XMLDIR = $(shell pkg-config --variable=prefix compiz)/share/compiz
 else
     DESTDIR = $(HOME)/.$(TARGET)/plugins
     XMLDIR = $(HOME)/.$(TARGET)/metadata
