@@ -53,18 +53,23 @@ do
     shift
 done
 
-if [ ! -e $xsltdir/bcop.xslt ]; then
-    echo -n "The needed stylesheet $xsltdir/bcop.xslt was not found. Aborting..."
-    exit 1
-fi
-
 xmlfile="$1"
 
 if [ -e $xmlfile ]; then
     if [ -n "$hdrfile" ]; then
         xsltproc --stringparam "header" "true" $xsltdir/bcop.xslt $xmlfile > "$hdrfile"
+	RETVAL=$?
+	if [ $RETVAL -ne 0 ]; then
+	    rm -f $hdrfile
+	    exit $RETVAL
+	fi
     fi
     if [ -n "$srcfile" ]; then
         xsltproc --stringparam "source" "true" $xsltdir/bcop.xslt $xmlfile > "$srcfile"
+	RETVAL=$?
+	if [ $RETVAL -ne 0 ]; then
+	    rm -f $srcfile
+	    exit $RETVAL
+	fi
     fi
 fi
