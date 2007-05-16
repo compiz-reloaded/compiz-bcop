@@ -4,8 +4,6 @@ AC_INIT([bcop],esyscmd(. ./VERSION;echo -n $VERSION), [onestone@beryl-project.or
 
 AC_DEFINE_UNQUOTED(VERSION,"$VERSION",[Version])
 
-#AC_CONFIG_AUX_DIR(config)
-
 AM_INIT_AUTOMAKE([1.9 dist-bzip2])
 AC_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE
