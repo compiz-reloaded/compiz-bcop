@@ -289,6 +289,12 @@ typedef struct _</xsl:text>
                 <xsl:text>;
 </xsl:text>
             </xsl:for-each>
+            <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
+                <xsl:text>    unsigned int </xsl:text>
+                <xsl:value-of select="@name"/>
+                <xsl:text>;
+</xsl:text>
+            </xsl:for-each>
         </xsl:if>
         <xsl:text>} </xsl:text>
         <xsl:value-of select="$Plugin"/>
@@ -319,6 +325,12 @@ typedef struct _</xsl:text>
 </xsl:text>
             </xsl:for-each>
             <xsl:for-each select="/compiz/plugin[@name=$pName]/screen//option[@type = 'list' and ./allowed/value and ./type/text() = 'string']">
+                <xsl:text>    unsigned int </xsl:text>
+                <xsl:value-of select="@name"/>
+                <xsl:text>;
+</xsl:text>
+            </xsl:for-each>
+            <xsl:for-each select="/compiz/plugin[@name=$pName]/screen//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
                 <xsl:text>    unsigned int </xsl:text>
                 <xsl:value-of select="@name"/>
                 <xsl:text>;
@@ -647,6 +659,27 @@ void </xsl:text>
 
 </xsl:text>
                     </xsl:if>
+
+                    <xsl:if test="./type[text() = 'int']/../desc/value">
+                        <xsl:text>unsigned int </xsl:text>
+                        <xsl:value-of select="$plugin"/>
+			<xsl:text>Get</xsl:text>
+			<xsl:call-template name="printOptionName"/>
+			<xsl:text>Mask (</xsl:text>
+			<xsl:call-template name="baseType"/>
+			<xsl:text>)
+{
+    </xsl:text>
+                    <xsl:call-template name="initPrivate"/>
+                    <xsl:text>    return </xsl:text>
+                    <xsl:call-template name="privateName"/>
+                    <xsl:text>-></xsl:text>
+                    <xsl:value-of select="@name"/>
+                    <xsl:text>;
+}
+
+</xsl:text>
+                    </xsl:if>
                 </xsl:when>
             </xsl:choose>
             <xsl:text>CompOption * </xsl:text>
@@ -752,7 +785,25 @@ void </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>", "</xsl:text>
         <xsl:value-of select="@type"/>
-        <xsl:text>", 0, 0, 0 },
+        <xsl:text>", </xsl:text>
+        <xsl:choose>
+            <xsl:when test="(@type = 'int' or @type = 'float') and (./min/text() and ./max/text())">
+                <xsl:text>"&lt;min&gt;</xsl:text>
+                <xsl:value-of select="./min/text()"/>
+                <xsl:text>&lt;/min&gt;&lt;max&gt;</xsl:text>
+                <xsl:value-of select="./max/text()"/>
+                <xsl:text>&lt;/max&gt;", </xsl:text>
+            </xsl:when>
+            <xsl:when test="@type = 'list' and ./type/text()">
+                <xsl:text>"&lt;type&gt;</xsl:text>
+                <xsl:value-of select="./type/text()"/>
+                <xsl:text>&lt;/type&gt;", </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>0, </xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>0, 0 },
 </xsl:text>
     </xsl:template>
 
@@ -907,6 +958,21 @@ void </xsl:text>
             <xsl:text> |= (1 &lt;&lt; j);
 </xsl:text>
         </xsl:if>
+        <xsl:if test="@type = 'list' and ./desc/value and ./type/text() = 'int'">
+            <xsl:text>            int i;
+            </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+            for (i = 0; i &lt; o->value.list.nValue; i++)
+                </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> |= (1 &lt;&lt; o->value.list.value[i].i);
+</xsl:text>
+        </xsl:if>
         <xsl:text>            if (</xsl:text>
         <xsl:call-template name="privateName"/>
         <xsl:text>->notify[</xsl:text>
@@ -946,7 +1012,9 @@ void </xsl:text>
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option[@type = 'string']/allowed/value or
         (/compiz/plugin[@name=$pName]/screen//option[@type = 'list']/allowed/value and
-        /compiz/plugin[@name=$pName]/screen//option[@type = 'list']/type/text() = 'string')">
+        /compiz/plugin[@name=$pName]/screen//option[@type = 'list']/type/text() = 'string') or
+        (/compiz/plugin[@name=$pName]/screen//option[@type = 'list']/desc/value and
+        /compiz/plugin[@name=$pName]/screen//option[@type = 'list']/type/text() = 'int')">
             <xsl:text>CompOption *o;
     int i;
     </xsl:text>
@@ -1024,6 +1092,26 @@ void </xsl:text>
 
 </xsl:text>
         </xsl:if>
+
+        <xsl:if test="@type = 'list' and ./desc/value and ./type/text() = 'int'">
+            <xsl:text>    o = &amp;os->opt[</xsl:text>
+            <xsl:call-template name="printOptionsEnumName"/>
+            <xsl:text>];
+    </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+    for (i = 0; i &lt; o->value.list.nValue; i++)
+        </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> |= (1 &lt;&lt; o->value.list.value[i].i);
+
+</xsl:text>
+        </xsl:if>
+        
         </xsl:for-each>
 
         <xsl:text>    if (</xsl:text>
@@ -1082,7 +1170,9 @@ static void </xsl:text>
    </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display//option[@type = 'string']/allowed/value or
         (/compiz/plugin[@name=$pName]/display//option[@type = 'list']/allowed/value and
-        /compiz/plugin[@name=$pName]/display//option[@type = 'list']/type/text() = 'string')">
+        /compiz/plugin[@name=$pName]/display//option[@type = 'list']/type/text() = 'string') or
+        (/compiz/plugin[@name=$pName]/display//option[@type = 'list']/desc/value and
+        /compiz/plugin[@name=$pName]/display//option[@type = 'list']/type/text() = 'int')">
             <xsl:text>CompOption *o;
     int i;
     </xsl:text>
@@ -1165,6 +1255,26 @@ static void </xsl:text>
 
 </xsl:text>
         </xsl:if>
+        
+        <xsl:if test="@type = 'list' and ./desc/value and ./type/text() = 'int'">
+            <xsl:text>    o = &amp;od->opt[</xsl:text>
+            <xsl:call-template name="printOptionsEnumName"/>
+            <xsl:text>];
+    </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> = 0;
+    for (i = 0; i &lt; o->value.list.nValue; i++)
+        </xsl:text>
+            <xsl:call-template name="privateName"/>
+            <xsl:text>-></xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> |= (1 &lt;&lt; o->value.list.value[i].i);
+
+</xsl:text>
+        </xsl:if>
+        
         </xsl:for-each>
         <xsl:text>    if (</xsl:text>
         <xsl:value-of select="$plugin"/>
@@ -1530,6 +1640,34 @@ CompOption *</xsl:text>
 
 </xsl:text>
         </xsl:for-each>
+                <xsl:for-each select="/compiz/plugin[@name=$pName]//option[@type = 'int' and ./desc/value]">
+            <xsl:text>typedef enum
+{
+</xsl:text>
+            <xsl:for-each select="desc/name">
+                <xsl:text>    </xsl:text>
+                <xsl:call-template name="PrintCamel">
+		    <xsl:with-param name="text">
+			<xsl:value-of select="../../@name"/>
+		    </xsl:with-param>
+		</xsl:call-template>
+                <xsl:call-template name="PrintCamel">
+		    <xsl:with-param name="text">
+			<xsl:value-of select="text()"/>
+		    </xsl:with-param>
+	        </xsl:call-template>
+	        <xsl:text> = </xsl:text>
+	        <xsl:value-of select="../value/text()"/>
+	        <xsl:text>,
+</xsl:text>
+            </xsl:for-each>
+            <xsl:text>} </xsl:text>
+            <xsl:value-of select="$Plugin"/>
+            <xsl:call-template name="printOptionName"/>
+            <xsl:text>Enum;
+
+</xsl:text>
+        </xsl:for-each>
     </xsl:template>
 
     <xsl:template name="printOptionMasks">
@@ -1548,6 +1686,28 @@ CompOption *</xsl:text>
 	        </xsl:call-template>
 	        <xsl:text>Mask (1 &lt;&lt; </xsl:text>
 	        <xsl:number value="position()-1"/>
+	        <xsl:text>)
+</xsl:text>
+            </xsl:for-each>
+            <xsl:text>
+
+</xsl:text>
+        </xsl:for-each>
+        <xsl:for-each select="/compiz/plugin[@name=$pName]//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
+            <xsl:for-each select="desc/name">
+                <xsl:text>#define </xsl:text>
+                <xsl:call-template name="PrintCamel">
+		    <xsl:with-param name="text">
+			<xsl:value-of select="../../@name"/>
+		    </xsl:with-param>
+		</xsl:call-template>
+                <xsl:call-template name="PrintCamel">
+		    <xsl:with-param name="text">
+			<xsl:value-of select="text()"/>
+		    </xsl:with-param>
+	        </xsl:call-template>
+	        <xsl:text>Mask (1 &lt;&lt; </xsl:text>
+	        <xsl:value-of select="../value/text()"/>
 	        <xsl:text>)
 </xsl:text>
             </xsl:for-each>
@@ -1664,6 +1824,16 @@ void             </xsl:text>
                     <xsl:text>;
 </xsl:text>
                     <xsl:if test="./type[text() = 'string']/../allowed/value">
+                        <xsl:text>unsigned int     </xsl:text>
+                        <xsl:value-of select="$plugin"/>
+			<xsl:text>Get</xsl:text>
+			<xsl:call-template name="printOptionName"/>
+			<xsl:text>Mask (</xsl:text>
+			<xsl:call-template name="baseType"/>
+			<xsl:text>);
+</xsl:text>
+                    </xsl:if>
+                    <xsl:if test="./type[text() = 'int']/../desc/value">
                         <xsl:text>unsigned int     </xsl:text>
                         <xsl:value-of select="$plugin"/>
 			<xsl:text>Get</xsl:text>
