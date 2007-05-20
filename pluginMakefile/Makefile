@@ -53,18 +53,20 @@ LDFLAGS = `pkg-config --libs $(PKG_DEP) $(TARGET) `
 is-bcop-target := $(shell if [ -e $(PLUGIN).xml ]; then cat $(PLUGIN).xml | grep "useBcop=\"true\"";fi )
 
 bcop-target := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN).xml; fi )
-bcop-target-src := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN)_options.c; fi )
-bcop-target-hdr := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(PLUGIN)_options.h; fi )
+bcop-target-src := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(BUILDDIR)/$(PLUGIN)_options.c; fi )
+bcop-target-hdr := $(shell if [ -n "$(is-bcop-target)" ]; then echo $(BUILDDIR)/$(PLUGIN)_options.h; fi )
 
 gen-schemas := $(shell if [ -e $(PLUGIN).xml ] && [ -n `pkg-config --variable=xsltdir compiz-gconf` ]; then echo true; fi )
 schema-target := $(shell if [ -n "$(gen-schemas)" ]; then echo $(PLUGIN).xml; fi )
-schema-output := $(shell if [ -n "$(gen-schemas)" ]; then echo compiz-$(PLUGIN).schema; fi )
+schema-output := $(shell if [ -n "$(gen-schemas)" ]; then echo $(BUILDDIR)/compiz-$(PLUGIN).schema; fi )
 
 # find all the object files (including those from .moc.cpp files)
 
 c-objs := $(patsubst %.c,%.lo,$(shell find -name '*.c' 2> /dev/null | grep -v "$(BUILDDIR)/" | sed -e 's/^.\///'))
 c-objs := $(filter-out $(bcop-target-src:.c=.lo),$(c-objs))
-c-objs += $(bcop-target-src:.c=.lo)
+
+all-c-objs := $(addprefix $(BUILDDIR)/,$(c-objs)) 
+all-c-objs += $(bcop-target-src:.c=.lo)
 
 # system include path parameter, -isystem doesn't work on old gcc's
 inc-path-param = $(shell if [ -z "`gcc --version | head -n 1 | grep ' 3'`" ]; then echo "-isystem"; else echo "-I"; fi)
@@ -84,7 +86,7 @@ bcop-build:   $(bcop-target-hdr) $(bcop-target-src)
 
 schema-creation: $(schema-output)
 
-c-build-objs: $(addprefix $(BUILDDIR)/,$(cxx-objs))
+c-build-objs: $(all-c-objs)
 
 c-link-plugin: $(BUILDDIR)/lib$(PLUGIN).la
 
@@ -101,7 +103,7 @@ $(DESTDIR) :
 #
 # BCOP'ing
 
-%_options.h: %.xml
+$(BUILDDIR)/%_options.h: %.xml
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e -n "\033[0;1;5mbcop'ing  \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
 	else \
@@ -112,7 +114,7 @@ $(DESTDIR) :
 		echo -e "\r\033[0mbcop'ing  : \033[34m$< -> $@\033[0m"; \
 	fi
 
-%_options.c: %.xml
+$(BUILDDIR)/%_options.c: %.xml
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e -n "\033[0;1;5mbcop'ing  \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
 	else \
@@ -126,7 +128,7 @@ $(DESTDIR) :
 #
 # Schema generation
 
-compiz-%.schema: %.xml
+$(BUILDDIR)/compiz-%.schema: %.xml
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e -n "\033[0;1;5mschema    \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
 	else \
@@ -149,10 +151,22 @@ $(BUILDDIR)/%.lo: %.c
 	else \
 		echo "compiling $< -> $@"; \
 	fi
-	@$(LIBTOOL) --quiet --mode=compile $(CC) $(CFLAGS) -c -o $@ $<
+	@$(LIBTOOL) --quiet --mode=compile $(CC) $(CFLAGS) -I$(BUILDDIR) -c -o $@ $<
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mcompiling : \033[34m$< -> $@\033[0m"; \
 	fi
+
+$(BUILDDIR)/%.lo: $(BUILDDIR)/%.c
+	@if [ '$(color)' != 'no' ]; then \
+		echo -n -e "\033[0;1;5mcompiling \033[0;1;37m: \033[0;32m$< \033[0;1;37m-> \033[0;31m$@\033[0m"; \
+	else \
+		echo "compiling $< -> $@"; \
+	fi
+	@$(LIBTOOL) --quiet --mode=compile $(CC) $(CFLAGS) -I$(BUILDDIR) -c -o $@ $<
+	@if [ '$(color)' != 'no' ]; then \
+		echo -e "\r\033[0mcompiling : \033[34m$< -> $@\033[0m"; \
+	fi
+
 
 #
 # Linking
@@ -166,7 +180,7 @@ $(BUILDDIR)/lib$(PLUGIN).la: $(addprefix $(BUILDDIR)/,$(c-objs))
 	else \
 		echo "linking  -> $@"; \
 	fi
-	@$(LIBTOOL) --quiet --mode=link $(CC) $(LDFLAGS) -rpath $(DESTDIR) -o $@ $(addprefix $(BUILDDIR)/,$(c-objs))
+	@$(LIBTOOL) --quiet --mode=link $(CC) $(LDFLAGS) -rpath $(DESTDIR) -o $@ $(all-c-objs)
 	@if [ '$(color)' != 'no' ]; then \
 		echo -e "\r\033[0mlinking  -> \033[34m$@\033[0m"; \
 	fi
@@ -174,9 +188,6 @@ $(BUILDDIR)/lib$(PLUGIN).la: $(addprefix $(BUILDDIR)/,$(c-objs))
 
 clean:
 	rm -rf $(BUILDDIR)
-	rm -f $(bcop-target-src)
-	rm -f $(bcop-target-hdr)
-	rm -f $(schema-output)
 
 install: $(DESTDIR) all
 	@if [ '$(color)' != 'no' ]; then \
