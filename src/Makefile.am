@@ -6,4 +6,5 @@ bin_SCRIPTS = bcop
 
 DISTCLEANFILES=$(bin_SCRIPTS)
 
-EXTRA_DIST=$(bin_SCRIPTS) $(xml_files)
+EXTRA_DIST=bcop.in \
+	   $(xml_files)
