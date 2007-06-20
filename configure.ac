@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([bcop],esyscmd(. ./VERSION;echo -n $VERSION), [onestone@beryl-project.org])
+AC_INIT([compiz-bcop],esyscmd(. ./VERSION;echo -n $VERSION), [onestone@beryl-project.org])
 
 AC_DEFINE_UNQUOTED(VERSION,"$VERSION",[Version])
 
