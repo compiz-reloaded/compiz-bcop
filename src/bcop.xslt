@@ -1420,7 +1420,7 @@ CompOption *</xsl:text>
             <xsl:text>typedef enum
 {
 </xsl:text>
-            <xsl:for-each select="desc/name">
+            <xsl:for-each select="desc/*[(name() = 'name' and not(@xml:lang)) or name() = '_name']">
                 <xsl:text>    </xsl:text>
                 <xsl:call-template name="PrintCamel">
 		    <xsl:with-param name="text">
@@ -1448,7 +1448,7 @@ CompOption *</xsl:text>
 
     <xsl:template name="printOptionMasks">
         <xsl:for-each select="/compiz/plugin[@name=$pName]//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
-            <xsl:for-each select="desc/name">
+            <xsl:for-each select="desc/*[(name() = 'name' and not(@xml:lang)) or name() = '_name']">
                 <xsl:text>#define </xsl:text>
                 <xsl:call-template name="PrintCamel">
 		    <xsl:with-param name="text">
