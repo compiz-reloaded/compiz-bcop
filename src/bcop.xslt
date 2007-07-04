@@ -264,7 +264,7 @@ typedef struct _</xsl:text>
     int screenPrivateIndex;
 
 </xsl:text>
-        <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
+        <xsl:if test="plugin[@name=$pName]/display//option">
             <xsl:text>    CompOption opt[</xsl:text>
             <xsl:value-of select="$Plugin"/>
             <xsl:text>DisplayOptionNum];
@@ -274,12 +274,12 @@ typedef struct _</xsl:text>
             <xsl:value-of select="$Plugin"/>
             <xsl:text>DisplayOptionNum];
 </xsl:text>
-            <xsl:for-each select="/compiz/plugin[@name=$pName]/display//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
+            <xsl:for-each select="plugin[@name=$pName]/display//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
                 <xsl:text>    unsigned int </xsl:text>
                 <xsl:value-of select="@name"/>
                 <xsl:text>;
 </xsl:text>
-            </xsl:for-each>
+            </xsl:for-each>    
         </xsl:if>
         <xsl:text>} </xsl:text>
         <xsl:value-of select="$Plugin"/>
@@ -290,7 +290,7 @@ typedef struct _</xsl:text>
         <xsl:text>OptionsScreen
 {
 </xsl:text>
-        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
+        <xsl:if test="plugin[@name=$pName]/screen//option">
             <xsl:text>    CompOption opt[</xsl:text>
             <xsl:value-of select="$Plugin"/>
             <xsl:text>ScreenOptionNum];
@@ -300,7 +300,7 @@ typedef struct _</xsl:text>
             <xsl:value-of select="$Plugin"/>
             <xsl:text>ScreenOptionNum];
 </xsl:text>
-            <xsl:for-each select="/compiz/plugin[@name=$pName]/screen//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
+            <xsl:for-each select="plugin[@name=$pName]/screen//option[@type = 'list' and ./desc/value and ./type/text() = 'int']">
                 <xsl:text>    unsigned int </xsl:text>
                 <xsl:value-of select="@name"/>
                 <xsl:text>;
