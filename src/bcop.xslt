@@ -1331,6 +1331,10 @@ static void </xsl:text>
         <xsl:text>OptionsGetCompPluginInfo
 #endif
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 CompPluginVTable *</xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsGetCompPluginInfo (void);
@@ -1341,7 +1345,11 @@ CompPluginVTable *</xsl:text>
         <xsl:call-template name="printOptionEnums"/>
         <xsl:call-template name="printOptionMasks"/>
         <xsl:call-template name="printFunctionDefinitions"/>
-        <xsl:text>#endif
+        <xsl:text>#ifdef  __cplusplus
+}
+#endif
+
+#endif
 </xsl:text>
     </xsl:template>
 
