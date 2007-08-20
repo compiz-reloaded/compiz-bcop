@@ -522,7 +522,7 @@ unsigned short </xsl:text>
 
 </xsl:text>
                 </xsl:when>
-                 <xsl:when test="@type='action'">
+                 <xsl:when test="@type='action' or @type='key' or @type='button' or @type='edge' or @type='bell'">
                     <xsl:text>CompAction * </xsl:text>
                     <xsl:call-template name="printGetFunctionDef"/>
                     <xsl:text>
@@ -775,7 +775,7 @@ void </xsl:text>
     <xsl:template name="setDisplayOptions">
         <xsl:text>static Bool </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsSetDisplayOption (CompPlugin *plugin, CompDisplay *d, char *name, CompOptionValue *value)
+        <xsl:text>OptionsSetDisplayOption (CompPlugin *plugin, CompDisplay *d, const char *name, CompOptionValue *value)
 {
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
@@ -808,7 +808,7 @@ void </xsl:text>
     <xsl:template name="setScreenOptions">
         <xsl:text>static Bool </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsSetScreenOption (CompPlugin *plugin, CompScreen *s, char *name, CompOptionValue *value)
+        <xsl:text>OptionsSetScreenOption (CompPlugin *plugin, CompScreen *s, const char *name, CompOptionValue *value)
 {
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
@@ -1548,7 +1548,7 @@ unsigned short   </xsl:text>
 		    <xsl:text>);
 </xsl:text>
                 </xsl:when>
-                 <xsl:when test="@type='action'">
+                 <xsl:when test="@type='action' or @type='key' or @type='button' or @type='edge' or @type='bell'">
                     <xsl:text>CompAction *     </xsl:text>
                     <xsl:call-template name="printGetFunctionDef"/>
                     <xsl:text>;
