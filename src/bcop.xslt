@@ -1257,6 +1257,10 @@ static void </xsl:text>
             <xsl:text>OptionsGetDisplayOptions,
     </xsl:text>
         </xsl:if>
+        <xsl:if test="not(/compiz/plugin[@name=$pName]/display//option)">
+	    <xsl:text>    (GetPluginObjectOptionsProc) 0,
+    </xsl:text>
+        </xsl:if>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
 	    <xsl:text>    (GetPluginObjectOptionsProc) </xsl:text>
 	    <xsl:value-of select="$plugin"/>
@@ -1279,6 +1283,10 @@ static CompBool </xsl:text>
 	    <xsl:text>    (SetPluginObjectOptionProc) </xsl:text>
 	    <xsl:value-of select="$plugin"/>
             <xsl:text>OptionsSetDisplayOption,
+    </xsl:text>
+        </xsl:if>
+        <xsl:if test="not(/compiz/plugin[@name=$pName]/display//option)">
+	    <xsl:text>    (SetPluginObjectOptionsProc) 0,
     </xsl:text>
         </xsl:if>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
