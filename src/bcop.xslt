@@ -1286,7 +1286,7 @@ static CompBool </xsl:text>
     </xsl:text>
         </xsl:if>
         <xsl:if test="not(/compiz/plugin[@name=$pName]/display//option)">
-	    <xsl:text>    (SetPluginObjectOptionsProc) 0,
+	    <xsl:text>    (SetPluginObjectOptionProc) 0,
     </xsl:text>
         </xsl:if>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
