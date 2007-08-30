@@ -201,12 +201,10 @@
 #include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 
-#include &lt;compiz.h&gt;
+#include &lt;compiz-core.h&gt;
 
-#define _</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_INTERNAL
-#include "</xsl:text>
+</xsl:text>
+        <xsl:text>#include "</xsl:text>
         <xsl:value-of select="$filename"/>
         <xsl:text>"
 
@@ -228,7 +226,7 @@ CompPluginVTable </xsl:text>
         <xsl:text>_OPTIONS_DISPLAY(d) \
         ((</xsl:text>
         <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsDisplay *) (d)->privates[displayPrivateIndex].ptr)
+        <xsl:text>OptionsDisplay *) (d)->object.privates[displayPrivateIndex].ptr)
 
 #define </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
@@ -244,7 +242,7 @@ CompPluginVTable </xsl:text>
         <xsl:text>_OPTIONS_SCREEN(s, od) \
         ((</xsl:text>
         <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsScreen *) (s)->privates[(od)->screenPrivateIndex].ptr)
+        <xsl:text>OptionsScreen *) (s)->object.privates[(od)->screenPrivateIndex].ptr)
 
 #define </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
@@ -326,6 +324,8 @@ typedef struct _</xsl:text>
 	<xsl:call-template name="initFiniScreen"/>
 	<xsl:call-template name="initFiniDisplay"/>
 	<xsl:call-template name="initFini"/>
+	<xsl:call-template name="initFiniObject"/>
+	<xsl:call-template name="getSetObject"/>
 	<xsl:call-template name="getVTable"/>
     </xsl:template>
 
@@ -926,7 +926,7 @@ void </xsl:text>
     if (!os)
         return FALSE;
 
-    s->privates[od->screenPrivateIndex].ptr = os;
+    s->object.privates[od->screenPrivateIndex].ptr = os;
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
@@ -965,14 +965,7 @@ void </xsl:text>
         
         </xsl:for-each>
 
-        <xsl:text>    if (</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable &amp;&amp; </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->initScreen)
-        return </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->initScreen (p, s);
+        <xsl:text>
     return TRUE;
 }
 
@@ -980,15 +973,6 @@ static void </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsFiniScreen (CompPlugin *p, CompScreen *s)
 {
-    if (</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable &amp;&amp; </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->finiScreen)
-        return </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->finiScreen (p, s);
-
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_SCREEN (s);
@@ -1041,7 +1025,7 @@ static void </xsl:text>
         return FALSE;
     }
 
-    d->privates[displayPrivateIndex].ptr = od;
+    d->object.privates[displayPrivateIndex].ptr = od;
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
@@ -1079,14 +1063,7 @@ static void </xsl:text>
         </xsl:if>
         
         </xsl:for-each>
-        <xsl:text>    if (</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable &amp;&amp; </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->initDisplay)
-        return </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->initDisplay (p, d);
+        <xsl:text>
     return TRUE;
 }
 
@@ -1094,15 +1071,6 @@ static void </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsFiniDisplay (CompPlugin *p, CompDisplay *d)
 {
-    if (</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable &amp;&amp; </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->finiDisplay)
-        return </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>PluginVTable->finiDisplay (p, d);
-
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_DISPLAY (d);
@@ -1204,6 +1172,130 @@ static void </xsl:text>
 </xsl:text>
     </xsl:template>
 
+<!-- init/fini object plugin -->
+
+    <xsl:template name="initFiniObject">
+        <xsl:text>static CompBool </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsInitObject (CompPlugin *p, CompObject *o)
+{
+    static InitPluginObjectProc dispTab[] = {
+        (InitPluginObjectProc) </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsInitDisplay,
+        (InitPluginObjectProc) </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsInitScreen
+    };
+
+    RETURN_DISPATCH (o, dispTab, ARRAY_SIZE (dispTab), TRUE, (p, o));
+}
+
+static void </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsFiniObject (CompPlugin *p, CompObject *o)
+{
+    static FiniPluginObjectProc dispTab[] = {
+        (FiniPluginObjectProc) </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsFiniDisplay,
+        (FiniPluginObjectProc) </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsFiniScreen
+    };
+
+    DISPATCH (o, dispTab, ARRAY_SIZE (dispTab), (p, o));
+}
+
+static CompBool </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsInitObjectWrapper (CompPlugin *p, CompObject *o)
+{
+    CompBool rv = TRUE;
+    rv = </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsInitObject (p, o);
+    if (</xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>PluginVTable->initObject)
+        rv &amp;= </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>PluginVTable->initObject (p, o);
+    return rv;
+}
+
+static void </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsFiniObjectWrapper (CompPlugin *p, CompObject *o)
+{
+    if (</xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>PluginVTable->finiObject)
+        </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>PluginVTable->finiObject (p, o);
+    </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsFiniObject (p, o);
+}
+
+</xsl:text>
+    </xsl:template>
+
+<!-- get/set object options -->
+
+    <xsl:template name="getSetObject">
+        <xsl:text>static CompOption * </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsGetObjectOptions (CompPlugin *p, CompObject *o, int *count)
+{
+    static GetPluginObjectOptionsProc dispTab[] = {
+        </xsl:text>
+        <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
+	    <xsl:text>    (GetPluginObjectOptionsProc) </xsl:text>
+	    <xsl:value-of select="$plugin"/>
+            <xsl:text>OptionsGetDisplayOptions,
+    </xsl:text>
+        </xsl:if>
+        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
+	    <xsl:text>    (GetPluginObjectOptionsProc) </xsl:text>
+	    <xsl:value-of select="$plugin"/>
+            <xsl:text>OptionsGetScreenOptions
+    </xsl:text>
+        </xsl:if>
+        <xsl:text>};
+
+    RETURN_DISPATCH (o, dispTab, ARRAY_SIZE (dispTab),
+		     (void *) (*count = 0), (p, o, count));
+}
+
+static CompBool </xsl:text>
+        <xsl:value-of select="$plugin"/>
+        <xsl:text>OptionsSetObjectOption (CompPlugin *p, CompObject *o, const char *name, CompOptionValue *value)
+{
+    static SetPluginObjectOptionProc dispTab[] = {
+    </xsl:text>
+        <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
+	    <xsl:text>    (SetPluginObjectOptionProc) </xsl:text>
+	    <xsl:value-of select="$plugin"/>
+            <xsl:text>OptionsSetDisplayOption,
+    </xsl:text>
+        </xsl:if>
+        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
+	<xsl:text>    (SetPluginObjectOptionProc) </xsl:text>
+	    <xsl:value-of select="$plugin"/>
+            <xsl:text>OptionsSetScreenOption
+    </xsl:text>
+        </xsl:if>
+        <xsl:text>};
+
+    RETURN_DISPATCH (o, dispTab, ARRAY_SIZE (dispTab), FALSE,
+		     (p, o, name, value));
+}
+
+</xsl:text>
+    </xsl:template>
+
 <!-- vtable generation -->
 
     <xsl:template name="getVTable">
@@ -1218,7 +1310,7 @@ static void </xsl:text>
 }
 
 </xsl:text>
-        <xsl:text>CompPluginVTable *getCompPluginInfo (void)
+        <xsl:text>CompPluginVTable *getCompPluginInfo20070830 (void)
 {
     if (!</xsl:text>
         <xsl:value-of select="$plugin"/>
@@ -1227,8 +1319,7 @@ static void </xsl:text>
         </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable = </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsGetCompPluginInfo ();
+        <xsl:text>getCompPluginInfo ();
         memcpy(&amp;</xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsVTable, </xsl:text>
@@ -1255,52 +1346,26 @@ static void </xsl:text>
         </xsl:text>
 
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsVTable.initDisplay = </xsl:text>
+        <xsl:text>OptionsVTable.initObject = </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsInitDisplay;
+        <xsl:text>OptionsInitObjectWrapper;
         </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsVTable.finiDisplay = </xsl:text>
+        <xsl:text>OptionsVTable.finiObject = </xsl:text>
         <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsFiniDisplay;
-        </xsl:text>
-
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsVTable.initScreen = </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsInitScreen;
-        </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsVTable.finiScreen = </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsFiniScreen;
+        <xsl:text>OptionsFiniObjectWrapper;
         </xsl:text>
 
-        <xsl:if test="/compiz/plugin[@name=$pName]/display//option">
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsVTable.getDisplayOptions = </xsl:text>
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsGetDisplayOptions;
+	<xsl:value-of select="$plugin"/>
+	<xsl:text>OptionsVTable.getObjectOptions = </xsl:text>
+	<xsl:value-of select="$plugin"/>
+	<xsl:text>OptionsGetObjectOptions;
 	</xsl:text>
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsVTable.setDisplayOption = </xsl:text>
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsSetDisplayOption;
+	<xsl:value-of select="$plugin"/>
+	<xsl:text>OptionsVTable.setObjectOption = </xsl:text>
+	<xsl:value-of select="$plugin"/>
+	<xsl:text>OptionsSetObjectOption;
 	</xsl:text>
-        </xsl:if>
-        <xsl:if test="/compiz/plugin[@name=$pName]/screen//option">
-            <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsVTable.getScreenOptions = </xsl:text>
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsGetScreenOptions;
-	</xsl:text>
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsVTable.setScreenOption = </xsl:text>
-	    <xsl:value-of select="$plugin"/>
-	    <xsl:text>OptionsSetScreenOption;
-	</xsl:text>
-	</xsl:if>
-
         <xsl:text>
     }
     return &amp;</xsl:text>
@@ -1323,21 +1388,11 @@ static void </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_H
 
-#ifndef _</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_INTERNAL
-#define getCompPluginInfo </xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsGetCompPluginInfo
-#endif
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-CompPluginVTable *</xsl:text>
-        <xsl:value-of select="$plugin"/>
-        <xsl:text>OptionsGetCompPluginInfo (void);
+CompPluginVTable * getCompPluginInfo (void);
 
 </xsl:text>
         <xsl:call-template name="printDisplayOptionsEnum"/>
