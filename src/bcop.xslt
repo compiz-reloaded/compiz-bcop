@@ -1388,9 +1388,9 @@ static CompBool </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_H
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
+#include &lt;compiz-common.h&gt;
+
+COMPIZ_BEGIN_DECLS
 
 CompPluginVTable * getCompPluginInfo (void);
 
@@ -1400,9 +1400,7 @@ CompPluginVTable * getCompPluginInfo (void);
         <xsl:call-template name="printOptionEnums"/>
         <xsl:call-template name="printOptionMasks"/>
         <xsl:call-template name="printFunctionDefinitions"/>
-        <xsl:text>#ifdef  __cplusplus
-}
-#endif
+        <xsl:text>COMPIZ_END_DECLS
 
 #endif
 </xsl:text>
