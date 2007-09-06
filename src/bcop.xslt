@@ -226,7 +226,7 @@ CompPluginVTable </xsl:text>
         <xsl:text>_OPTIONS_DISPLAY(d) \
         ((</xsl:text>
         <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsDisplay *) (d)->object.privates[displayPrivateIndex].ptr)
+        <xsl:text>OptionsDisplay *) (d)->base.privates[displayPrivateIndex].ptr)
 
 #define </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
@@ -242,7 +242,7 @@ CompPluginVTable </xsl:text>
         <xsl:text>_OPTIONS_SCREEN(s, od) \
         ((</xsl:text>
         <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsScreen *) (s)->object.privates[(od)->screenPrivateIndex].ptr)
+        <xsl:text>OptionsScreen *) (s)->base.privates[(od)->screenPrivateIndex].ptr)
 
 #define </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
@@ -926,7 +926,7 @@ void </xsl:text>
     if (!os)
         return FALSE;
 
-    s->object.privates[od->screenPrivateIndex].ptr = os;
+    s->base.privates[od->screenPrivateIndex].ptr = os;
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen/descendant-or-self::option">
@@ -1025,7 +1025,7 @@ static void </xsl:text>
         return FALSE;
     }
 
-    d->object.privates[displayPrivateIndex].ptr = od;
+    d->base.privates[displayPrivateIndex].ptr = od;
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display/descendant-or-self::option">
@@ -1180,6 +1180,7 @@ static void </xsl:text>
         <xsl:text>OptionsInitObject (CompPlugin *p, CompObject *o)
 {
     static InitPluginObjectProc dispTab[] = {
+        (InitPluginObjectProc) 0,
         (InitPluginObjectProc) </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsInitDisplay,
@@ -1196,6 +1197,7 @@ static void </xsl:text>
         <xsl:text>OptionsFiniObject (CompPlugin *p, CompObject *o)
 {
     static FiniPluginObjectProc dispTab[] = {
+        (FiniPluginObjectProc) 0,
         (FiniPluginObjectProc) </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsFiniDisplay,
@@ -1250,6 +1252,7 @@ static void </xsl:text>
         <xsl:text>OptionsGetObjectOptions (CompPlugin *p, CompObject *o, int *count)
 {
     static GetPluginObjectOptionsProc dispTab[] = {
+        (GetPluginObjectOptionsProc) 0,
         </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display/descendant-or-self::option">
 	    <xsl:text>    (GetPluginObjectOptionsProc) </xsl:text>
@@ -1278,6 +1281,7 @@ static CompBool </xsl:text>
         <xsl:text>OptionsSetObjectOption (CompPlugin *p, CompObject *o, const char *name, CompOptionValue *value)
 {
     static SetPluginObjectOptionProc dispTab[] = {
+        (SetPluginObjectOptionProc) 0,
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display/descendant-or-self::option">
 	    <xsl:text>    (SetPluginObjectOptionProc) </xsl:text>
