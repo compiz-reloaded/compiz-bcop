@@ -1272,8 +1272,9 @@ static void </xsl:text>
         </xsl:if>
         <xsl:text>};
 
+    *count = 0;
     RETURN_DISPATCH (o, dispTab, ARRAY_SIZE (dispTab),
-		     (void *) (*count = 0), (p, o, count));
+		     NULL, (p, o, count));
 }
 
 static CompBool </xsl:text>
