@@ -1157,7 +1157,7 @@ static void </xsl:text>
         <xsl:text>PluginVTable &amp;&amp; </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable->fini)
-        return </xsl:text>
+        </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable->fini (p);
 
