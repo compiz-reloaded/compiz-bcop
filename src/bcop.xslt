@@ -1422,7 +1422,7 @@ CompPluginVTable * getCompPluginInfo (void);
 #define PLUGIN_SCREEN(object, plugin, prefix) \
     plugin##Screen * prefix##s = \
 	GET_PLUGIN_SCREEN (object, \
-	GET_PLUGIN_DISPLAY (s->display, plugin), plugin)
+	GET_PLUGIN_DISPLAY ((object)->display, plugin), plugin)
 
 #define GET_PLUGIN_WINDOW(object, parent, plugin) \
     ((plugin##Window *) \
@@ -1430,8 +1430,8 @@ CompPluginVTable * getCompPluginInfo (void);
 #define PLUGIN_WINDOW(object, plugin, prefix) \
     plugin##Window * prefix##w = \
 	GET_PLUGIN_WINDOW  (object, \
-	GET_PLUGIN_SCREEN  (w->screen, \
-	GET_PLUGIN_DISPLAY (w->screen->display, plugin), plugin), plugin)
+	GET_PLUGIN_SCREEN  ((object)->screen, \
+	GET_PLUGIN_DISPLAY ((object)->screen->display, plugin), plugin), plugin)
 
 #endif
 
