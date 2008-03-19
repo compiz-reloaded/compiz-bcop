@@ -208,7 +208,9 @@
         <xsl:value-of select="$filename"/>
         <xsl:text>"
 
-static int displayPrivateIndex;
+static int </xsl:text>
+       <xsl:value-of select="$Plugin"/>
+       <xsl:text>OptionsDisplayPrivateIndex;
 
 static CompMetadata </xsl:text>
         <xsl:value-of select="$plugin"/>
@@ -221,39 +223,16 @@ CompPluginVTable </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsVTable;
 
-#define GET_</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_DISPLAY(d) \
-        ((</xsl:text>
-        <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsDisplay *) (d)->base.privates[displayPrivateIndex].ptr)
-
 #define </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_DISPLAY(d) \
-        </xsl:text>
+        <xsl:text>_OPTIONS_DISPLAY(d) PLUGIN_DISPLAY(d, </xsl:text>
         <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsDisplay *od = GET_</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_DISPLAY (d)
-
-#define GET_</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_SCREEN(s, od) \
-        ((</xsl:text>
-        <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsScreen *) (s)->base.privates[(od)->screenPrivateIndex].ptr)
-
+        <xsl:text>Options, o)
 #define </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_SCREEN(s) \
-        </xsl:text>
+        <xsl:text>_OPTIONS_SCREEN(s) PLUGIN_SCREEN(s, </xsl:text>
         <xsl:value-of select="$Plugin"/>
-        <xsl:text>OptionsScreen *os = GET_</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_SCREEN (s, GET_</xsl:text>
-        <xsl:value-of select="$PLUGIN"/>
-        <xsl:text>_OPTIONS_DISPLAY (s->display))
+        <xsl:text>Options, o)
 
 typedef struct _</xsl:text>
         <xsl:value-of select="$Plugin"/>
@@ -1025,7 +1004,9 @@ static void </xsl:text>
         return FALSE;
     }
 
-    d->base.privates[displayPrivateIndex].ptr = od;
+    d->base.privates[</xsl:text>
+    <xsl:value-of select="$Plugin"/>
+    <xsl:text>OptionsDisplayPrivateIndex].ptr = od;
 
     </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/display/descendant-or-self::option">
@@ -1098,8 +1079,12 @@ static void </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>OptionsInit (CompPlugin *p)
 {
-    displayPrivateIndex = allocateDisplayPrivateIndex();
-    if (displayPrivateIndex &lt; 0)
+    </xsl:text>
+    <xsl:value-of select="$Plugin"/>
+    <xsl:text>OptionsDisplayPrivateIndex = allocateDisplayPrivateIndex();
+    if (</xsl:text>
+    <xsl:value-of select="$Plugin"/>
+    <xsl:text>OptionsDisplayPrivateIndex &lt; 0)
         return FALSE;
 
     if (!compInitPluginMetadataFromInfo (&amp;</xsl:text>
@@ -1161,8 +1146,12 @@ static void </xsl:text>
         <xsl:value-of select="$plugin"/>
         <xsl:text>PluginVTable->fini (p);
 
-    if (displayPrivateIndex >= 0)
-        freeDisplayPrivateIndex(displayPrivateIndex);
+    if (</xsl:text>
+        <xsl:value-of select="$Plugin"/>
+        <xsl:text>OptionsDisplayPrivateIndex >= 0)
+        freeDisplayPrivateIndex (</xsl:text>
+        <xsl:value-of select="$Plugin"/>
+        <xsl:text>OptionsDisplayPrivateIndex);
 
     compFiniMetadata (&amp;</xsl:text>
         <xsl:value-of select="$plugin"/>
