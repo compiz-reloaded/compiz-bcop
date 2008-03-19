@@ -1490,7 +1490,7 @@ CompOption *</xsl:text>
 <!-- generate enums/masks for restricted string options -->
 
     <xsl:template name="printOptionEnums">
-                <xsl:for-each select="/compiz/plugin[@name=$pName]/descendant-or-self::option[@type = 'int' and ./desc/value]">
+                <xsl:for-each select="/compiz/plugin[@name=$pName]/descendant-or-self::option[(@type = 'int' or (@type = 'list' and ./type/text() = 'int')) and ./desc/value]">
             <xsl:text>typedef enum
 {
 </xsl:text>
