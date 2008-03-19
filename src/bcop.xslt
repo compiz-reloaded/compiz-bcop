@@ -1413,7 +1413,40 @@ CompPluginVTable * getCompPluginInfo (void);
         <xsl:call-template name="printOptionEnums"/>
         <xsl:call-template name="printOptionMasks"/>
         <xsl:call-template name="printFunctionDefinitions"/>
-        <xsl:text>COMPIZ_END_DECLS
+        <xsl:text>#ifndef GENERIC_PRIVATE_DEFINES
+#define GENERIC_PRIVATE_DEFINES
+
+#define GET_PLUGIN_CORE(object, plugin) \
+    ((plugin##Core *) (object)->base.privates[plugin##CorePrivateIndex].ptr)
+#define PLUGIN_CORE(object, plugin, prefix) \
+    plugin##Core * prefix##c = GET_PLUGIN_CORE (object, plugin)
+
+#define GET_PLUGIN_DISPLAY(object, plugin) \
+    ((plugin##Display *) \
+	(object)->base.privates[plugin##DisplayPrivateIndex].ptr)
+#define PLUGIN_DISPLAY(object, plugin, prefix) \
+    plugin##Display * prefix##d = GET_PLUGIN_DISPLAY (object, plugin)
+
+#define GET_PLUGIN_SCREEN(object, parent, plugin) \
+    ((plugin##Screen *) \
+	(object)->base.privates[(parent)->screenPrivateIndex].ptr)
+#define PLUGIN_SCREEN(object, plugin, prefix) \
+    plugin##Screen * prefix##s = \
+	GET_PLUGIN_SCREEN (object, \
+	GET_PLUGIN_DISPLAY (s->display, plugin), plugin)
+
+#define GET_PLUGIN_WINDOW(object, parent, plugin) \
+    ((plugin##Window *) \
+	(object)->base.privates[(parent)->windowPrivateIndex].ptr)
+#define PLUGIN_WINDOW(object, plugin, prefix) \
+    plugin##Window * prefix##w = \
+	GET_PLUGIN_WINDOW  (object, \
+	GET_PLUGIN_SCREEN  (w->screen, \
+	GET_PLUGIN_DISPLAY (w->screen->display, plugin), plugin), plugin)
+
+#endif
+
+COMPIZ_END_DECLS
 
 #endif
 </xsl:text>
