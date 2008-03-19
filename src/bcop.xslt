@@ -1701,7 +1701,7 @@ void             </xsl:text>
             <xsl:value-of select="$plugin"/>
             <xsl:call-template name="screenOrDisplay"/>
             <xsl:text>OptionChangeNotifyProc notify);
-            
+
 </xsl:text>
         </xsl:for-each>
     </xsl:template>
