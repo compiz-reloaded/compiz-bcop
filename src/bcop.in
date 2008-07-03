@@ -18,7 +18,7 @@
 #  GNU General Public License for more details.
 #
 
-xsltdir=`pkg-config --variable xsltpath bcop`
+xsltdir=@prefix@/share/bcop
 
 function usage
 {
