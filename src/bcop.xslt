@@ -723,6 +723,11 @@ void </xsl:text>
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_DISPLAY(d);
+    if (!od)
+    {
+        *count = 0;
+        return NULL;
+    }
     *count = </xsl:text>
         <xsl:value-of select="$Plugin"/>
         <xsl:text>DisplayOptionNum;
@@ -740,6 +745,11 @@ void </xsl:text>
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_SCREEN(s);
+    if (!os)
+    {
+        *count = 0;
+        return NULL;
+    }
     *count = </xsl:text>
         <xsl:value-of select="$Plugin"/>
         <xsl:text>ScreenOptionNum;
@@ -955,6 +965,9 @@ static void </xsl:text>
     </xsl:text>
         <xsl:value-of select="$PLUGIN"/>
         <xsl:text>_OPTIONS_SCREEN (s);
+    </xsl:text>
+    <xsl:value-of select="$PLUGIN"/>
+        <xsl:text>_OPTIONS_DISPLAY (s->display);
 
 </xsl:text>
         <xsl:if test="/compiz/plugin[@name=$pName]/screen/descendant-or-self::option">
@@ -966,6 +979,7 @@ static void </xsl:text>
 </xsl:text>
         </xsl:if>
         <xsl:text>    free (os);
+    s->base.privates[od->screenPrivateIndex].ptr = NULL;
 }
 
 </xsl:text>
@@ -1067,6 +1081,9 @@ static void </xsl:text>
 </xsl:text>
         </xsl:if>
         <xsl:text>    free (od);
+    d->base.privates[</xsl:text>
+        <xsl:value-of select="$Plugin"/>
+        <xsl:text>OptionsDisplayPrivateIndex].ptr = NULL;
 }
 
 </xsl:text>
