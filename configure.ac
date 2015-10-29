@@ -1,10 +1,8 @@
 AC_PREREQ(2.57)
 
-AC_INIT([compiz-bcop],esyscmd(. ./VERSION;echo -n $VERSION), [onestone@beryl-project.org])
+AC_INIT([compiz-bcop], [0.8.9], [onestone@beryl-project.org])
 
-AC_DEFINE_UNQUOTED(VERSION,"$VERSION",[Version])
-
-AM_INIT_AUTOMAKE([1.9 dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 foreign dist-xz no-dist-gzip check-news])
 AC_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE
 
