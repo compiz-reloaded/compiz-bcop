@@ -1,2 +1,3 @@
 # compiz-bcop
-clone of latest 0.8.x series
+
+Futher development of Compiz 0.8.x series (compiz-reloaded).
