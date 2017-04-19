@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([compiz-bcop], [0.8.14], [onestone@compiz.org])
+AC_INIT([compiz-bcop], [0.8.15], [onestone@compiz.org])
 
 AM_INIT_AUTOMAKE([1.9 foreign dist-xz no-dist-gzip check-news])
 AC_CONFIG_HEADER([config.h])
